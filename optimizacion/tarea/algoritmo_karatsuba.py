@@ -167,18 +167,31 @@ result_std = contador_digitos_std(num_1)
 end_std = time.perf_counter()
 
 # Mostrar resultados y tiempos
-print(f"Método iterativo para {num_1}: {result_iter} dígitos")
-print(f"Tiempo del método iterativo: {end_iter - start_iter:.10f} segundos")
+print("\033[1;34m" + "Resultados del conteo de dígitos" + "\033[0m")
+print("-" * 50)
 
-print(f"Método eficiente (personalizado) para {num_1}: {result_opti} dígitos")
-print(f"Tiempo del método eficiente (personalizado): {end_opti - start_opti:.10f} segundos")
+print("\033[1;32m" + f"Método iterativo para {num_1}: {result_iter} dígitos" + "\033[0m")
+print(f"Tiempo del método iterativo: {(end_iter - start_iter) * 1_000_000:.2f} microsegundos")
 
-print(f"Método con biblioteca estándar para {num_1}: {result_std} dígitos")
-print(f"Tiempo del método estándar: {end_std - start_std:.10f} segundos")
+print("\033[1;32m" + f"Método eficiente (personalizado) para {num_1}: {result_opti} dígitos" + "\033[0m")
+print(f"Tiempo del método eficiente (personalizado): {(end_opti - start_opti) * 1_000_000:.2f} microsegundos")
 
-print("-"*50)
-print("La prueba termino")
-#_ = input("Enter para continuar")
+print("\033[1;32m" + f"Método con biblioteca estándar para {num_1}: {result_std} dígitos" + "\033[0m")
+print(f"Tiempo del método estándar: {(end_std - start_std) * 1_000_000:.2f} microsegundos")
+
+# Determinar el método más rápido
+tiempos = {
+    "Método iterativo": (end_iter - start_iter),
+    "Método eficiente (personalizado)": (end_opti - start_opti),
+    "Método con biblioteca estándar": (end_std - start_std)
+}
+
+ganador = min(tiempos, key=tiempos.get)
+print("\033[1;33m" + f"El método más rápido es: {ganador}" + "\033[0m")
+
+print("-" * 50)
+print("\033[1;34m" + "La prueba terminó" + "\033[0m")
+_ = input("Presiona Enter para continuar con el método Karatsuba")
 os.system("clear")
 
 
@@ -249,6 +262,28 @@ def karatsuba(num_1, num_2):
 num_1 = 12345
 num_2 = 67891
 
-print(f"Resultado Karatsuba: {karatsuba(num_1, num_2)}")
-print(f"Resultado normal: {num_1*num_2}")
-print("Son iguales" if (num_1*num_2) == karatsuba(num_1,num_2) else "No es igual")
+# Prueba y medición de tiempo para el algoritmo de Karatsuba
+start_karatsuba = time.perf_counter()
+resultado_karatsuba = karatsuba(num_1, num_2)
+end_karatsuba = time.perf_counter()
+
+# Prueba y medición de tiempo para la multiplicación normal
+start_normal = time.perf_counter()
+resultado_normal = num_1 * num_2
+end_normal = time.perf_counter()
+
+# Mostrar resultados y tiempos
+print("\033[1;34m" + "Resultados de la multiplicación" + "\033[0m")
+print("-" * 50)
+
+print("\033[1;32m" + f"Resultado Karatsuba: {resultado_karatsuba}" + "\033[0m")
+print(f"Tiempo del algoritmo Karatsuba: {(end_karatsuba - start_karatsuba) * 1_000_000:.2f} microsegundos")
+
+print("\033[1;32m" + f"Resultado normal: {resultado_normal}" + "\033[0m")
+print(f"Tiempo de la multiplicación normal: {(end_normal - start_normal) * 1_000_000:.2f} microsegundos")
+
+# Comparar resultados
+if resultado_karatsuba == resultado_normal:
+    print("\033[1;33m" + "Son iguales" + "\033[0m")
+else:
+    print("\033[1;31m" + "No es igual" + "\033[0m")
