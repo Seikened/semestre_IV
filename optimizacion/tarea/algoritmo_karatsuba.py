@@ -195,10 +195,10 @@ def separador(num_1,num_2):
     
     mitad = (tam_mayor // 2) + (tam_mayor % 2)
     
-    return [mayor,tam_mayor,mitad]
+    return mayor,tam_mayor,mitad
 
 
-def nomalizador_simple(num_user_1, num_user_2):
+def nomalizador(num_user_1, num_user_2):
     """
     Divide los números en partes altas y bajas (am + b) * (cm + d).
     """
@@ -209,10 +209,11 @@ def nomalizador_simple(num_user_1, num_user_2):
         return num_1, num_2, 0, 0
 
     # Determinar el tamaño del mayor número
-    mayor, _, mitad = separador(num_1, num_2)
-    divisor = 10 ** mitad  # Simplificar divisor al punto medio
-
-    # Dividir los números en partes altas y bajas
+    mayor,tam_mayor,mitad = separador(num_1, num_2)
+    
+    m = tam_mayor // 2
+    divisor = 10**m
+    
     a = num_1 // divisor
     b = num_1 % divisor
     c = num_2 // divisor
@@ -220,9 +221,7 @@ def nomalizador_simple(num_user_1, num_user_2):
 
     return a, c, b, d
 
-
-
-def karatsuba_simple(num_1, num_2):
+def karatsuba(num_1, num_2):
     """
     Algoritmo de Karatsuba para multiplicación de números grandes.
     """
@@ -231,12 +230,12 @@ def karatsuba_simple(num_1, num_2):
         return num_1 * num_2
 
     # Dividir los números en partes altas y bajas
-    a, c, b, d = nomalizador_simple(num_1, num_2)
+    a, c, b, d = nomalizador(num_1, num_2)
 
     # Recursividad para las multiplicaciones clave
-    ac = karatsuba_simple(a, c)
-    bd = karatsuba_simple(b, d)
-    terminos_cruzados = karatsuba_simple(a + b, c + d) - ac - bd
+    ac = karatsuba(a, c)
+    bd = karatsuba(b, d)
+    terminos_cruzados = karatsuba(a + b, c + d) - ac - bd
 
     # Determinar potencias de 10 para combinar resultados
     mitad = max(contador_digitos(num_1), contador_digitos(num_2)) // 2
@@ -247,12 +246,9 @@ def karatsuba_simple(num_1, num_2):
     return (ac * mitad_2m) + (terminos_cruzados * mitad_m) + bd
 
 
-
-
-
-
-
 num_1 = 12345
 num_2 = 67891
 
-print(f"Resultado Karatsuba: {karatsuba_simple(num_1, num_2)}")
+print(f"Resultado Karatsuba: {karatsuba(num_1, num_2)}")
+print(f"Resultado normal: {num_1*num_2}")
+print("Son iguales" if (num_1*num_2) == karatsuba(num_1,num_2) else "No es igual")
