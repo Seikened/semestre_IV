@@ -1,0 +1,32 @@
+
+# Ignorar archivos de macOS
+.DS_Store
+
+# Ignorar directorios de Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+*.so
+
+# Ignorar archivos de logs
+*.log
+*.out
+*.err
+
+# Ignorar archivos de configuración de IDEs y editores
+.vscode/
+.idea/
+*.swp
+
+# Ignorar archivos de backup o temporales
+*.bak
+*.tmp
+*~
+*.swp
+*.swo
+

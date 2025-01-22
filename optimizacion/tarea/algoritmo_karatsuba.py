@@ -259,8 +259,8 @@ def karatsuba(num_1, num_2):
     return (ac * mitad_2m) + (terminos_cruzados * mitad_m) + bd
 
 
-num_1 = 12345
-num_2 = 67891
+num_1 = 123454356783451234
+num_2 = 678911563566784321
 
 # Prueba y medición de tiempo para el algoritmo de Karatsuba
 start_karatsuba = time.perf_counter()

@@ -1,0 +1,73 @@
+﻿indicador,ENERO,FEBRERO,MARZO,ABRIL,MAYO,JUNIO,JULIO,AGOSTO,SEPTIEMBRE,OCTUBRE,NOVIEMBRE,DICIEMBRE,TOTAL,anio
+Numero de pacientes que ingresan a Admision Hospitalaria,1813,861,713,1369,1322,736,696,532,968,805,663,346,10824,2018
+Numero de personas con ingreso de admision contínua a Hospital,10,67,2,5,13,25,23,13,14,15,1,1,189,2018
+Numero de personas con ingreso de admision urgencias  a terapia,50,35,43,32,54,42,50,31,40,34,41,37,489,2018
+Numero de pacientes en alta  de admision ,1601,1505,1481,1694,1629,1699,1637,1738,1627,1620,1572,1169,18972,2018
+Defunciones en Terapias,6,20,11,8,16,15,18,11,12,13,17,14,161,2018
+Pacientes de terapia a Hospital,58,50,61,68,50,64,50,65,60,70,50,55,701,2018
+Defunciones en Urgencias ,50,35,43,32,54,42,54,30,40,34,41,37,492,2018
+Egresos Hospitalarios,1089,1070,926,994,879,972,1116,1122,1084,1151,940,949,12292,2018
+Defunciones Hospitalarias,70,81,53,48,48,47,63,57,65,57,57,71,717,2018
+Intervenciones quirúrgicas,815,864,865,891,883,907,923,1001,966,915,870,812,10712,2018
+uso de tiempo quirurgico fin de semana en horas,336,420,336,336,336,420,336,378,294,336,420,336,4284,2018
+uso de tiempo quirurgico dias habiles en horas,3168,2880,2736,3024,2880,3024,3168,3168,3168,3168,2880,3024,36288,2018
+Numero de pacientes que ingresan a Admision Hospitalaria,728,815,789,840,773,899,849,485,445,280,286,415,7604,2019
+Numero de personas con ingreso de admision contínua a Hospital,35,20,60,25,25,30,75,105,70,60,105,50,660,2019
+Numero de personas con ingreso de admision urgencias  a terapia,114,114,78,66,24,48,54,30,36,48,48,78,738,2019
+Numero de pacientes en alta  de admision ,575,565,581,537,548,573,573,557,525,493,502,482,6511,2019
+Defunciones en Terapias,8,6,11,8,12,10,7,8,10,8,15,6,109,2019
+Pacientes de terapia a Hospital,60,52,62,70,55,64,58,68,68,75,53,60,745,2019
+Defunciones en Urgencias ,19,19,13,11,4,22,8,5,4,6,8,13,132,2019
+Egresos Hospitalarios,753,833,791,890,811,871,829,825,784,461,490,626,8964,2019
+Defunciones Hospitalarias,66,84,69,39,38,43,47,37,49,41,41,35,589,2019
+Intervenciones quirúrgicas,723,741,736,796,686,764,777,776,685,579,646,659,8568,2019
+uso de tiempo quirurgico fin de semana en horas,336,420,336,294,378,378,451,321,323,224,277,225,3963,2019
+uso de tiempo quirurgico dias habiles en horas,2772,3024,2508,3024,2394,2904,2765,2014,2076,2267,2101,2151,30000,2019
+Numero de pacientes que ingresan a Admision Hospitalaria,329,605,586,286,155,104,72,52,83,153,236,147,2808,2020
+Numero de personas con ingreso de admision contínua a Hospital,12,20,5,3,14,13,5,11,24,19,14,3,143,2020
+Numero de personas con ingreso de admision urgencias  a terapia,9,12,6,3,2,14,5,5,0,6,2,8,72,2020
+Numero de pacientes en alta  de admision ,461,480,390,255,578,1127,1197,792,638,610,628,591,7747,2020
+Defunciones en Terapias,9,12,8,3,4,11,11,4,5,7,3,2,79,2020
+Pacientes de terapia a Hospital,29,53,26,7,16,9,9,7,12,34,52,20,274,2020
+Defunciones en Urgencias ,7,8,4,3,2,14,5,5,0,6,3,9,66,2020
+Egresos Hospitalarios,501,820,685,417,255,408,468,424,452,520,486,644,6080,2020
+Defunciones Hospitalarias,48,49,49,23,36,107,159,127,52,37,33,106,826,2020
+Intervenciones quirúrgicas,646,573,443,276,110,112,99,123,187,276,351,255,3451,2020
+uso de tiempo quirurgico fin de semana en horas,198,195,200,150,150,130,144,140,145,144,142,144,1882,2020
+uso de tiempo quirurgico dias habiles en horas,1580,1494,1436,1015,490,660,660,650,635,645,970,848,11083,2020
+Numero de pacientes que ingresan  a Admision Hospitalaria,233,258,141,262,311,601,608,731,592,682,724,656,5799,2021
+Numero de personas con ingreso de admision contínua a Hospital,55,45,50,85,95,225,110,185,280,220,325,140,1815,2021
+Numero de personas con ingreso de admision urgencias  a terapia,48,36,24,18,0,6,30,36,30,24,42,36,330,2021
+Numero de pacientes en alta  de admision ,400,312,227,433,765,500,562,829,729,756,737,611,6861,2021
+Defunciones en Terapias,6,6,3,8,8,12,6,6,14,16,12,13,110,2021
+Pacientes de terapia a Hospital,16,21,25,31,39,89,87,84,69,68,95,80,704,2021
+Defunciones Urgencias ,9,4,3,3,0,1,5,0,5,4,7,6,47,2021
+Egresos Hospitalarios,644,623,420,554,565,762,765,948,833,1007,892,851,8864,2021
+Defunciones Hospitalarias,124,115,56,53,57,47,41,34,50,59,58,31,725,2021
+Intervenciones quirúrgicas,153,209,210,367,423,689,625,782,701,700,721,593,6173,2021
+uso de tiempo quirurgico fin de semana en horas,120,121,133,160,155,171,163,166,171,177,165,168,1870,2021
+uso de tiempo quirurgico dias habiles en horas,1600,1595,1645,1638,1517,1711,1709,1933,2029,1948,1940,1912,21177,2021
+Numero de pacientes que ingresan  a Admision Hospitalaria,610,668,602,589,662,721,716,736,640,740,713,666,8063,2022
+Numero de personas con ingreso de admision contínua a Hospital,225,275,220,230,95,150,210,160,180,285,280,120,2430,2022
+Numero de personas con ingreso de admision urgencias  a terapia,33,66,18,18,42,18,18,42,18,24,6,12,315,2022
+Numero de pacientes en alta  de admision ,922,806,653,664,522,567,584,553,603,525,581,665,7645,2022
+Defunciones en Terapias,16,14,9,16,14,9,14,8,8,19,17,14,158,2022
+Pacientes de terapia a Hospital,80,73,64,81,97,97,87,88,60,104,102,88,1021,2022
+Defunciones Urgencias ,5,10,3,3,7,3,3,7,3,4,1,2,51,2022
+Egresos Hospitalarios,830,785,838,781,781,934,885,914,851,893,902,861,10255,2022
+Defunciones Hospitalarias,47,49,38,59,42,55,47,35,32,44,60,46,554,2022
+Intervenciones quirúrgicas,678,624,640,605,724,787,739,811,663,762,802,703,8538,2022
+uso de tiempo quirurgico fin de semana en horas,151,161,155,152,158,153,324,288,288,288,288,288,2694,2022
+uso de tiempo quirurgico dias habiles en horas,1859,1645,1759,1740,1780,1851,2520,2760,2394,2898,2898,2394,26498,2022
+Numero de pacientes que ingresan a Admision Hospitalaria,691,764,639,732,726,891,828,849,778,866,820,742,9326,2023
+Numero de personas con ingreso de admision contínua a Hospital,38,54,17,74,33,29,33,32,49,22,19,17,417,2023
+Numero de personas con ingreso de admision urgencias  a terapia,9,4,2,6,4,4,2,6,11,3,3,5,59,2023
+Numero de pacientes en alta  de admision ,663,638,603,632,511,615,660,612,659,655,624,418,7290,2023
+Defunciones en Terapias,20,22,10,11,13,14,16,10,15,19,10,22,182,2023
+Pacientes de terapia a Hospital,82,101,81,87,88,98,65,95,91,100,97,94,1079,2023
+Defunciones Urgencias ,2,4,2,7,4,4,2,6,12,3,3,5,54,2023
+Egresos Hospitalarios,934,946,792,905,874,1037,996,932,941,961,910,847,11075,2023
+Defunciones Hospitalarias,63,51,30,51,56,51,54,48,63,67,46,55,635,2023
+Intervenciones quirúrgicas,703,757,693,800,750,845,812,837,766,750,720,664,9097,2023
+uso de tiempo quirurgico fin de semana en horas,324,486,288,288,384,486,384,384,432,384,540,432,4812,2023
+uso de tiempo quirurgico dias habiles en horas,2772,2646,2394,1890,2520,2646,2772,2898,2646,2772,2772,2646,31374,2023
