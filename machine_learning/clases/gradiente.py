@@ -49,7 +49,7 @@ x_min = gradiente(f,graf_f,x0,learning_rate,max_iter)
 
 
 f = lambda x: ((x[0] -2)**2) + ((x[0] +3)**2)
-graf_f = lambda x: np.array( 2 * (x[0]) - 4, 2 * (x[0]) + 6  )
+graf_f = lambda x: np.array([ 2 * (x[0]) - 4, 2 * (x[0]) + 6  ])
 x0 = np.array( [0.0 , 0.0] )
 learning_rate = 0.1
 max_iter = 100

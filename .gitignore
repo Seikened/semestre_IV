@@ -30,3 +30,8 @@ build/
 *.swp
 *.swo
 
+
+
+# Ignorar node_modules
+node_modules/
+
