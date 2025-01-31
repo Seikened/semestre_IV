@@ -1,5 +1,6 @@
 import rusty
 import time
+import math
 
 def python_sum_bigint(a: str, b: str):
     # 1) Parseamos antes de cronometrar la operación
@@ -34,13 +35,14 @@ def python_mod_exp(a: str, b: str, m: str):
 def python_factorize(n: str):
     n_int = int(n)
     start = time.perf_counter()
-    # Buscamos menor divisor
     factor = None
-    for i in range(2, int(n_int**0.5) + 1):
+    # Usamos math.isqrt para la raíz entera
+    limit = math.isqrt(n_int)
+    for i in range(2, limit + 1):
         if n_int % i == 0:
             factor = i
             break
-    # Si no hay divisor, el número es primo
+    # Si no hay divisor, es primo
     result = factor if factor else n_int
     end = time.perf_counter()
     op_time_ns = (end - start) * 1e9
@@ -77,34 +79,36 @@ def benchmark_rust_vs_python(operation_name, rust_func, py_func, *args):
 # --------------
 # EJEMPLO DE USO
 # --------------
-if __name__ == "__main__":
-    a, b = str(10**50), str(10**50)
-    modulo = str(10**20)
+import sys
+sys.set_int_max_str_digits(0)
+exp = 2000000
+a, b = str(10**exp), str(10**exp)
+modulo = str(10**exp)
 
-    benchmark_rust_vs_python(
-        "Suma de enteros grandes",
-        rusty.sum_bigint,
-        python_sum_bigint,
-        a, b
-    )
+benchmark_rust_vs_python(
+    "Suma de enteros grandes",
+    rusty.sum_bigint,
+    python_sum_bigint,
+    a, b
+)
 
-    benchmark_rust_vs_python(
-        "Multiplicación de enteros grandes",
-        rusty.multiply_bigint,
-        python_multiply_bigint,
-        a, b
-    )
+benchmark_rust_vs_python(
+    "Multiplicación de enteros grandes",
+    rusty.multiply_bigint,
+    python_multiply_bigint,
+    a, b
+)
 
-    benchmark_rust_vs_python(
-        "Exponenciación modular",
-        rusty.mod_exp,
-        python_mod_exp,
-        a, b, modulo
-    )
+benchmark_rust_vs_python(
+    "Exponenciación modular",
+    rusty.mod_exp,
+    python_mod_exp,
+    a, b, modulo
+)
 
-    benchmark_rust_vs_python(
-        "Factorización",
-        rusty.factorize,
-        python_factorize,
-        a
-    )
+benchmark_rust_vs_python(
+    "Factorización",
+    rusty.factorize,
+    python_factorize,
+    a
+)
