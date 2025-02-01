@@ -1,0 +1,242 @@
+{
+    "ln": {
+        "segundo": {
+            "Valor": 13.815510557964274,
+            "Tiempo de ejecución": "0.00000496 segundos"
+        },
+        "minuto": {
+            "Valor": 17.909855120186375,
+            "Tiempo de ejecución": "0.00000121 segundos"
+        },
+        "hora": {
+            "Valor": 22.004199682408476,
+            "Tiempo de ejecución": "0.00000113 segundos"
+        },
+        "dia": {
+            "Valor": 25.18225351275642,
+            "Tiempo de ejecución": "0.00000071 segundos"
+        },
+        "mes": {
+            "Valor": 28.583450894418576,
+            "Tiempo de ejecución": "0.00000079 segundos"
+        },
+        "anio": {
+            "Valor": 31.068357544206577,
+            "Tiempo de ejecución": "0.00000063 segundos"
+        },
+        "siglo": {
+            "Valor": 35.67352773019467,
+            "Tiempo de ejecución": "0.00000071 segundos"
+        }
+    },
+    "raiz": {
+        "segundo": {
+            "Valor": 1000.0,
+            "Tiempo de ejecución": "0.00000317 segundos"
+        },
+        "minuto": {
+            "Valor": 7745.966692414834,
+            "Tiempo de ejecución": "0.00000083 segundos"
+        },
+        "hora": {
+            "Valor": 60000.0,
+            "Tiempo de ejecución": "0.00000071 segundos"
+        },
+        "dia": {
+            "Valor": 293938.7691339814,
+            "Tiempo de ejecución": "0.00000067 segundos"
+        },
+        "mes": {
+            "Valor": 1609968.9437998487,
+            "Tiempo de ejecución": "0.00000067 segundos"
+        },
+        "anio": {
+            "Valor": 5577096.01853868,
+            "Tiempo de ejecución": "0.00000063 segundos"
+        },
+        "siglo": {
+            "Valor": 55770960.18538681,
+            "Tiempo de ejecución": "0.00000071 segundos"
+        }
+    },
+    "n": {
+        "segundo": {
+            "Valor": 1000000,
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "minuto": {
+            "Valor": 60000000,
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "hora": {
+            "Valor": 3600000000,
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "dia": {
+            "Valor": 86400000000,
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "mes": {
+            "Valor": 2592000000000,
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "anio": {
+            "Valor": 31104000000000,
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "siglo": {
+            "Valor": 3110400000000000,
+            "Tiempo de ejecución": "0.00000000 segundos"
+        }
+    },
+    "n_ln": {
+        "segundo": {
+            "Valor": 13815510.557964273,
+            "Tiempo de ejecución": "0.00000229 segundos"
+        },
+        "minuto": {
+            "Valor": 1074591307.2111826,
+            "Tiempo de ejecución": "0.00000092 segundos"
+        },
+        "hora": {
+            "Valor": 79215118856.67052,
+            "Tiempo de ejecución": "0.00000079 segundos"
+        },
+        "dia": {
+            "Valor": 2175746703502.1548,
+            "Tiempo de ejecución": "0.00000067 segundos"
+        },
+        "mes": {
+            "Valor": 74088304718332.95,
+            "Tiempo de ejecución": "0.00000071 segundos"
+        },
+        "anio": {
+            "Valor": 966350193055001.4,
+            "Tiempo de ejecución": "0.00000067 segundos"
+        },
+        "siglo": {
+            "Valor": 1.109589406519975e+17,
+            "Tiempo de ejecución": "0.00000067 segundos"
+        }
+    },
+    "n_2": {
+        "segundo": {
+            "Valor": 1000000000000,
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "minuto": {
+            "Valor": 3600000000000000,
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "hora": {
+            "Valor": "Inf",
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "dia": {
+            "Valor": "Inf",
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "mes": {
+            "Valor": "Inf",
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "anio": {
+            "Valor": "Inf",
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "siglo": {
+            "Valor": "Inf",
+            "Tiempo de ejecución": "0.00000000 segundos"
+        }
+    },
+    "n_3": {
+        "segundo": {
+            "Valor": "Inf",
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "minuto": {
+            "Valor": "Inf",
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "hora": {
+            "Valor": "Inf",
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "dia": {
+            "Valor": "Inf",
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "mes": {
+            "Valor": "Inf",
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "anio": {
+            "Valor": "Inf",
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "siglo": {
+            "Valor": "Inf",
+            "Tiempo de ejecución": "0.00000000 segundos"
+        }
+    },
+    "dos_n": {
+        "segundo": {
+            "Valor": "Inf",
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "minuto": {
+            "Valor": "Inf",
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "hora": {
+            "Valor": "Inf",
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "dia": {
+            "Valor": "Inf",
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "mes": {
+            "Valor": "Inf",
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "anio": {
+            "Valor": "Inf",
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "siglo": {
+            "Valor": "Inf",
+            "Tiempo de ejecución": "0.00000000 segundos"
+        }
+    },
+    "factorial": {
+        "segundo": {
+            "Valor": "Inf",
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "minuto": {
+            "Valor": "Inf",
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "hora": {
+            "Valor": "Inf",
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "dia": {
+            "Valor": "Inf",
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "mes": {
+            "Valor": "Inf",
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "anio": {
+            "Valor": "Inf",
+            "Tiempo de ejecución": "0.00000000 segundos"
+        },
+        "siglo": {
+            "Valor": "Inf",
+            "Tiempo de ejecución": "0.00000000 segundos"
+        }
+    }
+}
