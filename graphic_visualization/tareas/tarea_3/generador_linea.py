@@ -10,9 +10,9 @@ cord_uno = [2, 4]
 cord_dos = [12, 18]
 
 
-
 def crear_matriz(tamano):
     return np.array([["░" for _ in range(tamano)] for _ in range(tamano)], dtype=str)
+
 
 def pintar_pixel(x, y,cord_uno,cord_dos):
     x_1,y_1 = cord_uno
@@ -20,7 +20,7 @@ def pintar_pixel(x, y,cord_uno,cord_dos):
     A = y_2 - y_1
     B = x_1 - x_2
     C = (x_2 * y_1) - (x_1*y_2)
-    resultado = (A*x) + (B*y) + C 
+    resultado = abs((A*x) + (B*y) + C )
     return 1 > resultado >= 0
 
 
@@ -28,7 +28,7 @@ def pintar_pixel(x, y,cord_uno,cord_dos):
 def modificar_matriz(matriz):
     for i in range(tamano):
         for j in range(tamano):
-            if pintar_pixel(i, j,cord_uno,cord_dos):
+            if pintar_pixel(j, i,cord_uno,cord_dos):
                 matriz[i][j] = "█"
     return matriz
 
@@ -40,4 +40,34 @@ def imprimir_matriz(matriz):
 
 matriz = crear_matriz(tamano)
 matriz = modificar_matriz(matriz)
+imprimir_matriz(matriz)
+
+
+
+# DDA
+tamano = 20
+matriz = crear_matriz(tamano)
+
+cord_uno = [2, 4]
+cord_dos = [12, 18]
+x_1,y_1 = cord_uno
+x_2,y_2 = cord_dos
+
+delta_X = abs(x_2 - x_1)
+delta_Y = abs(y_2 - y_1)
+
+pasos = max(delta_X,delta_Y)
+
+
+X_inc = delta_X/pasos
+Y_inc = delta_Y/pasos
+
+x , y = x_1 , y_1
+
+
+for _ in range(pasos):
+    matriz[round(y)][round(x)] = "█"
+    x += X_inc
+    y += Y_inc
+
 imprimir_matriz(matriz)
