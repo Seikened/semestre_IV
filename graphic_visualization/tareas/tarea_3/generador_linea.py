@@ -5,9 +5,9 @@ import numpy as np
 
 console = Console()
 
-tamano = 20
+tamano = 50
 cord_uno = [2, 4]
-cord_dos = [12, 18]
+cord_dos = [48, 20]
 
 
 def crear_matriz(tamano):
@@ -45,11 +45,10 @@ imprimir_matriz(matriz)
 
 
 # DDA
-tamano = 20
+
 matriz = crear_matriz(tamano)
 
-cord_uno = [2, 4]
-cord_dos = [12, 18]
+
 x_1,y_1 = cord_uno
 x_2,y_2 = cord_dos
 
