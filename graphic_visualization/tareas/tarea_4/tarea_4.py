@@ -18,8 +18,8 @@ class Confi(enum.Enum):
     color_pixel = (155, 89, 182)
     
 
-def crear_matriz(tamano):
-    return np.array([["░" for _ in range(tamano)] for _ in range(tamano)], dtype=str)
+def crear_matriz(ancho, alto):
+    return np.array([["░" for _ in range(ancho)] for _ in range(alto)], dtype=str)
 
 def imprimir_matriz(matriz):
     table = Table(show_header=False, show_lines=False, expand=True)
@@ -119,12 +119,12 @@ def dibujar_pixel(x,y,color= Confi.color_pixel.value):
 #         mouse = (x // Confi.tam_pix.value, y // Confi.tam_pix.value)
 
 #         # Creamos la matriz y aplicamos el algoritmo de Bresenham
-#         matriz = crear_matriz(Confi.tamano.value)
+#         matriz = crear_matriz(ventana.get_width() // Confi.tam_pix.value, ventana.get_height() // Confi.tam_pix.value)
 #         matriz = bresenham(matriz, punto_inicial, mouse)
 
 #         # Dibujamos solo los píxeles marcados con "█"
-#         for i in range(Confi.tamano.value):
-#             for j in range(Confi.tamano.value):
+#         for i in range(matriz.shape[0]):
+#             for j in range(matriz.shape[1]):
 #                 if matriz[i][j] == "█":
 #                     dibujar_pixel(j, i)
 
