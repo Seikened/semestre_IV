@@ -19,13 +19,16 @@ lim = 51
 
 X = np.linspace(-rango, rango,1000)
 Y = [taylor_2(x, lim) for x in X]
+print(Y)
 
 # plt.plot(np.arange(len(serie)), serie, label="g(n)", marker="o")
-plt.plot(X, Y, label="Taylor series approximation")
-plt.xlabel("n")
-plt.ylabel("Valores de funciones")
-plt.title("Comparación de funciones g(n) y f(n)")
+plt.plot(X, Y, label=f"Grado mayor: {iter}", alpha=0.6) 
+
+
+plt.axhline(0, color="black", linewidth=0.5)
+plt.axvline(0, color="black", linewidth=0.5)
+plt.grid(True, linestyle="--", alpha=0.6)
 plt.xlim(-rango - 1, rango + 1)
-plt.legend()
-plt.grid(True)
+plt.ylim(-1.5, 1.5)
+plt.legend()    
 plt.show()
