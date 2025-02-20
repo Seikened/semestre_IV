@@ -101,37 +101,6 @@ def dibujar_pixel(x,y,color= Confi.color_pixel.value):
     pygame.draw.rect(ventana,color,(x*Confi.tam_pix.value,y*Confi.tam_pix.value,Confi.tam_pix.value,Confi.tam_pix.value))
 
 
-# while True:
-#     for evento in pygame.event.get():
-#         if evento.type == pygame.QUIT:
-#             pygame.quit()
-#             sys.exit()
-#         elif evento.type == pygame.MOUSEBUTTONDOWN:
-#             x, y = pygame.mouse.get_pos()
-#             punto_inicial = (x // Confi.tam_pix.value, y // Confi.tam_pix.value)
-
-#     ventana.fill(Confi.blanco.value)
-#     dibujar_rejilla()
-
-#     if punto_inicial is not None:
-#         # Obtenemos la posición actual del mouse
-#         x, y = pygame.mouse.get_pos()
-#         mouse = (x // Confi.tam_pix.value, y // Confi.tam_pix.value)
-
-#         # Creamos la matriz y aplicamos el algoritmo de Bresenham
-#         matriz = crear_matriz(ventana.get_width() // Confi.tam_pix.value, ventana.get_height() // Confi.tam_pix.value)
-#         matriz = bresenham(matriz, punto_inicial, mouse)
-
-#         # Dibujamos solo los píxeles marcados con "█"
-#         for i in range(matriz.shape[0]):
-#             for j in range(matriz.shape[1]):
-#                 if matriz[i][j] == "█":
-#                     dibujar_pixel(j, i)
-
-#     pygame.display.flip()
-    
-circulos = []
-
 while True:
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT:
@@ -139,20 +108,51 @@ while True:
             sys.exit()
         elif evento.type == pygame.MOUSEBUTTONDOWN:
             x, y = pygame.mouse.get_pos()
-            grid_x = x // Confi.tam_pix.value
-            grid_y = y // Confi.tam_pix.value
-            # Almacena los puntos del círculo al hacer clic
-            puntos_circulo = circulo(grid_x, grid_y, r=6)
-            circulos.append(puntos_circulo)
+            punto_inicial = (x // Confi.tam_pix.value, y // Confi.tam_pix.value)
 
     ventana.fill(Confi.blanco.value)
     dibujar_rejilla()
 
-    # Dibuja todos los círculos almacenados
-    for puntos_circulo in circulos:
-        for (j, i) in puntos_circulo:
-            dibujar_pixel(j, i)
+    if punto_inicial is not None:
+        # Obtenemos la posición actual del mouse
+        x, y = pygame.mouse.get_pos()
+        mouse = (x // Confi.tam_pix.value, y // Confi.tam_pix.value)
+
+        # Creamos la matriz y aplicamos el algoritmo de Bresenham
+        matriz = crear_matriz(ventana.get_width() // Confi.tam_pix.value, ventana.get_height() // Confi.tam_pix.value)
+        matriz = bresenham(matriz, punto_inicial, mouse)
+
+        # Dibujamos solo los píxeles marcados con "█"
+        for i in range(matriz.shape[0]):
+            for j in range(matriz.shape[1]):
+                if matriz[i][j] == "█":
+                    dibujar_pixel(j, i)
 
     pygame.display.flip()
+    
+# circulos = []
+
+# while True:
+#     for evento in pygame.event.get():
+#         if evento.type == pygame.QUIT:
+#             pygame.quit()
+#             sys.exit()
+#         elif evento.type == pygame.MOUSEBUTTONDOWN:
+#             x, y = pygame.mouse.get_pos()
+#             grid_x = x // Confi.tam_pix.value
+#             grid_y = y // Confi.tam_pix.value
+#             # Almacena los puntos del círculo al hacer clic
+#             puntos_circulo = circulo(grid_x, grid_y, r=6)
+#             circulos.append(puntos_circulo)
+
+#     ventana.fill(Confi.blanco.value)
+#     dibujar_rejilla()
+
+#     # Dibuja todos los círculos almacenados
+#     for puntos_circulo in circulos:
+#         for (j, i) in puntos_circulo:
+#             dibujar_pixel(j, i)
+
+#     pygame.display.flip()
 
 
