@@ -77,7 +77,7 @@ alto, ancho = img3.shape[:2]
 
 # Aplicar la transformación a la imagen 2 usando la homografía
 resultado_manual = cv2.warpPerspective(img2, H, (ancho, alto))
-# "Pegar" la imagen 3 sobre la imagen transformada
+
 resultado_manual[0:alto, 0:ancho] = img3
 
 # Mostrar el resultado manual
@@ -103,7 +103,7 @@ def probar_stitcher_con_subconjunto(imagenes, indices):
         plt.axis("off")
         plt.show()
 
-# Ejemplo: probar con imágenes 1-2, luego 2-3, 3-4, 4-5
+
 probar_stitcher_con_subconjunto(lista_natural_imgs, [0, 1])
 probar_stitcher_con_subconjunto(lista_natural_imgs, [1, 2])
 probar_stitcher_con_subconjunto(lista_natural_imgs, [2, 3])
