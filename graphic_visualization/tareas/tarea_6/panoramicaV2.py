@@ -124,3 +124,41 @@ print(puntos_img1)
 print(puntos_img2)
 print(H)
 
+# Warpeamos la imagen 1 para alinearla con la imagen 2
+warp_image = cv2.warpPerspective(
+    lista_natural_imgs[0],
+    H,
+    (lista_natural_imgs[0].shape[1] + lista_natural_imgs[1].shape[1],
+     lista_natural_imgs[0].shape[0])
+)
+gray_img = cv2.cvtColor(warp_image, cv2.COLOR_BGR2LAB)
+maskw = cv2.inRange(gray_img, np.array([0, 128, 128]), np.array([255, 255, 255]))
+
+canvas_img2 = np.zeros_like(warp_image)
+canvas_img2[0:lista_natural_imgs[1].shape[0], 0:lista_natural_imgs[1].shape[1]] = lista_natural_imgs[1]
+
+canvas_img2[maskw == 0] = np.array([0, 0, 0])
+# Y se pone en negro warp_image donde maskw es 255
+warp_image[maskw == 255] = np.array([0, 0, 0])
+
+# Se realiza la mezcla de las imágenes
+blend_image = cv2.add(warp_image, (canvas_img2 * 0.9).astype(np.uint8))
+panorama = warp_image.copy()
+mask_warp = cv2.cvtColor(warp_image, cv2.COLOR_BGR2GRAY)
+mask_canvas = cv2.cvtColor(canvas_img2, cv2.COLOR_BGR2GRAY)
+_, mask_warp_bin = cv2.threshold(mask_warp, 1, 255, cv2.THRESH_BINARY)
+_, mask_canvas_bin = cv2.threshold(mask_canvas, 1, 255, cv2.THRESH_BINARY)
+mask_warp_bool = mask_warp_bin.astype(bool)
+mask_canvas_bool = mask_canvas_bin.astype(bool)
+overlap = mask_warp_bool & mask_canvas_bool
+only_warp = mask_warp_bool & ~mask_canvas_bool  # Sólo contiene warp_image
+only_canvas = mask_canvas_bool & ~mask_warp_bool  # Sólo contiene canvas_img2
+panorama[only_warp] = warp_image[only_warp]
+panorama[only_canvas] = canvas_img2[only_canvas]
+blended = cv2.addWeighted(warp_image, 0.5, canvas_img2, 0.5, 0)
+panorama[overlap] = blended[overlap]
+
+# Mostramos la panorámica final
+cv2.imshow("Panorámica", panorama)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
