@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import cv2
 import os
+import json
 
 
 
@@ -111,6 +112,17 @@ def mouse_callback(event, x, y, flags, param):
         param.append([x, y])
 
 
+
+def save_coordinates(puntos, filename):
+    with open(filename, "w") as f:
+        json.dump(puntos, f)
+
+
+def load_coordinates(filename):
+    with open(filename, "r") as f:
+        puntos = json.load(f)
+    return [tuple(p) for p in puntos]
+
 # =============================================================================
 # MARCAR PUNTOS
 # =============================================================================
@@ -142,14 +154,45 @@ def marcar(img):
     return puntos
 
 
-puntos_img1 = marcar(lista_natural_imgs[0].copy())
-puntos_img2 = marcar(lista_natural_imgs[1].copy())
+def new_corditates():
+    puntos_img1 = marcar(img_1.copy())
+    puntos_img2 = marcar(img_2.copy())
+    save_coordinates(puntos_img1, coords_file1)
+    save_coordinates(puntos_img2, coords_file2)
+
+
+
+img_1 = lista_natural_imgs[0]
+img_2 = lista_natural_imgs[1]
+
+coords_file1 = os.path.join(ruta, "coordenadas_img1.json")
+coords_file2 = os.path.join(ruta, "coordenadas_img2.json")
+
+if os.path.exists(coords_file1) and os.path.exists(coords_file2):
+    puntos_img1 = load_coordinates(coords_file1)
+    puntos_img2 = load_coordinates(coords_file2)
+    os.system("clear")
+    print("Puntos cargados.")
+    nuevas = input("¿Deseas marcar nuevas coordenadas? (s/n): ")
+    if nuevas.lower() == 's':
+        new_corditates()
+        print("Nuevas coordenadas guardadas.")
+else:
+    new_corditates()
+    print("Coordenadas guardadas.")
+
+print("Coordenadas definitivas:")
+print("Imagen 1:", puntos_img1)
+print("Imagen 2:", puntos_img2)
+ 
+# Verificar que se hayan marcado 4 puntos en cada imagen
+if len(puntos_img1) != 4 or len(puntos_img2) != 4:
+    print("Error: Se requieren 4 puntos en cada imagen para calcular la homografía.")
+    exit(1)
 
 # resultados matriz de homografía
 H = homografia(np.array(puntos_img1), np.array(puntos_img2))
 
-print(puntos_img1)
-print(puntos_img2)
 print("MATRIZ MANUAL")
 print(H)
 
@@ -158,3 +201,57 @@ print(cv2.findHomography(np.array(puntos_img1), np.array(puntos_img2)))
 
 
 
+# =============================================================================
+# CLASE PARA REALIZAR LA TRANSFORMACIÓN MANUAL PIXEL A PIXEL
+# =============================================================================
+class ManualPanoramaWarper:
+    def __init__(self, base_image, image_to_warp, H):
+        """
+        base_image: Imagen base (img₂, donde recuperas los puntos) que usaremos como canvas.
+        image_to_warp: Imagen a transformar (img₁, donde hiciste los puntos).
+        H: Matriz de homografía que transforma image_to_warp a las coordenadas de base_image.
+           Se calculó como H = homografia(puntos_img1, puntos_img2).
+
+        """
+        self.base_image = base_image
+        self.image_to_warp = image_to_warp
+        self.H = H
+        self.h_warp, self.w_warp = image_to_warp.shape[:2]
+        self.h_base, self.w_base = base_image.shape[:2]
+
+    def transform_point(self, x, y):
+        # Transforma el punto (x, y) de image_to_warp usando la matriz H.
+        p = np.array([x, y, 1])
+        p_t = self.H @ p
+        p_t /= p_t[2]  # Normalizamos
+        return p_t[0], p_t[1]
+
+    def warp(self):
+        # Usamos la imagen base (img₂) como canvas.
+        panorama = self.base_image.copy()
+        # Recorremos image_to_warp pixel a pixel.
+        for y in range(self.h_warp):
+            for x in range(self.w_warp):
+                # Si el píxel tiene contenido (no es negro)
+                if not np.all(self.image_to_warp[y, x] == 0):
+                    new_x, new_y = self.transform_point(x, y)
+                    new_x = int(round(new_x))
+                    new_y = int(round(new_y))
+                    # Solo asignamos si el nuevo píxel cae dentro de los límites del canvas.
+                    if 0 <= new_x < self.w_base and 0 <= new_y < self.h_base:
+                        panorama[new_y, new_x] = self.image_to_warp[y, x]
+        return panorama
+
+# =============================================================================
+# USAR LA CLASE PARA GENERAR LA SEMI-PANORÁMICA MANUAL
+# =============================================================================
+warper = ManualPanoramaWarper(img_2, img_1, H)
+panorama_manual = warper.warp()
+
+# Mostrar el resultado
+plt.figure(figsize=(20, 10))
+plt.imshow(cv2.cvtColor(panorama_manual, cv2.COLOR_BGR2RGB))
+plt.title("Semi-Panorámica Manual Pixel a Pixel 🖼️")
+plt.axis("off")
+plt.savefig("imagen_panoramica.png", dpi=300, bbox_inches="tight")
+plt.show()
