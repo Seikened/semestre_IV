@@ -154,41 +154,16 @@ def marcar(img):
     return puntos
 
 
-def new_corditates():
-    puntos_img1 = marcar(img_1.copy())
-    puntos_img2 = marcar(img_2.copy())
-    save_coordinates(puntos_img1, coords_file1)
-    save_coordinates(puntos_img2, coords_file2)
-
-
-
 img_1 = lista_natural_imgs[0]
 img_2 = lista_natural_imgs[1]
 
-coords_file1 = os.path.join(ruta, "coordenadas_img1.json")
-coords_file2 = os.path.join(ruta, "coordenadas_img2.json")
-
-if os.path.exists(coords_file1) and os.path.exists(coords_file2):
-    puntos_img1 = load_coordinates(coords_file1)
-    puntos_img2 = load_coordinates(coords_file2)
-    os.system("clear")
-    print("Puntos cargados.")
-    nuevas = input("¿Deseas marcar nuevas coordenadas? (s/n): ")
-    if nuevas.lower() == 's':
-        new_corditates()
-        print("Nuevas coordenadas guardadas.")
-else:
-    new_corditates()
-    print("Coordenadas guardadas.")
+# Marcado de coordenadas
+puntos_img1 = marcar(img_1.copy())
+puntos_img2 = marcar(img_2.copy())
 
 print("Coordenadas definitivas:")
 print("Imagen 1:", puntos_img1)
 print("Imagen 2:", puntos_img2)
- 
-# Verificar que se hayan marcado 4 puntos en cada imagen
-if len(puntos_img1) != 4 or len(puntos_img2) != 4:
-    print("Error: Se requieren 4 puntos en cada imagen para calcular la homografía.")
-    exit(1)
 
 # resultados matriz de homografía
 H = homografia(np.array(puntos_img1), np.array(puntos_img2))
@@ -253,5 +228,5 @@ plt.figure(figsize=(20, 10))
 plt.imshow(cv2.cvtColor(panorama_manual, cv2.COLOR_BGR2RGB))
 plt.title("Semi-Panorámica Manual Pixel a Pixel 🖼️")
 plt.axis("off")
-plt.savefig("imagen_panoramica.png", dpi=300, bbox_inches="tight")
+plt.savefig("grafico.png", dpi=300, bbox_inches="tight")
 plt.show()
