@@ -47,7 +47,8 @@ class Funcion:
             xi = x0 - lr * grad_f_i
             x0 = xi.copy()
             x_historico.append(x0)
-            self.data_grad_simple.append((i, x0, nomra_grad))
+            self.data_grad_simple.append((i+1, x0.tolist(), nomra_grad))
+            
         self.imprimir_tabla_tabulate(self.data_grad_simple, self.headers)
         return x_historico
 
@@ -74,7 +75,7 @@ class Funcion:
             x0 = xi.copy()
             v0 = vi.copy()
             x_historico.append(x0)
-            self.data_grad_momentum.append((i, x0, nomra_grad, vi))
+            self.data_grad_momentum.append((i+1, x0.tolist(), nomra_grad))
             
         self.imprimir_tabla_tabulate(self.data_grad_momentum, ["Iteración", "x", "Norma", "velocidad"])
         return x_historico
