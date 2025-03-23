@@ -106,14 +106,11 @@ x_f1 = desenso_gradiente_simple(f1,grad_f1,x_0,alpha,iteraciones,epsilon)
 print("Momentum F1")
 momentum = desenso_gradiente_momentum(f1,grad_f1,x_0,v_0,alpha,iteraciones,eta,epsilon)
 
-
-import os 
-
-os.system("clear")
+# ================= Función 2 =================
 
 x_0 = np.array([-5,-2])
 alpha = 0.1
-v_0 = np.array([0])
+v_0 = np.array([0,0])
 iteraciones = 100
 epsilon = 0.001
 eta = 0.9
@@ -122,3 +119,15 @@ print("FUNCION SIN MOMENTUM")
 x_f1 = desenso_gradiente_simple(f2,grad_f2,x_0,alpha,iteraciones,epsilon)
 print("Momentum F1")
 momentum = desenso_gradiente_momentum(f2,grad_f2,x_0,v_0,alpha,iteraciones,eta,epsilon)
+
+# ================= Función 3 =================
+x_0 = np.array([-1,-1,-1])
+alpha = 0.1
+v_0 = np.array([0,0,0])
+iteraciones = 100
+epsilon = 0.001
+eta = 0.9
+print("FUNCION SIN MOMENTUM")
+x_f1 = desenso_gradiente_simple(f3,grad_f3,x_0,alpha,iteraciones,epsilon)
+print("Momentum F1")
+momentum = desenso_gradiente_momentum(f3,grad_f3,x_0,v_0,alpha,iteraciones,eta,epsilon)
