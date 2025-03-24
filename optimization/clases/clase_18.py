@@ -1,88 +1,12 @@
+from mathkat import Funcion
 import numpy as np
-import matplotlib.pyplot as plt
-from tabulate import tabulate
 
 
 
-class Funcion:
-    def __init__(self,f,grad_f,x_0,v_0,alpha,iteraciones,epsilon,eta):
-        self.f = f
-        self.grad_f = grad_f
-        self.x_0 = x_0
-        self.v_0 = v_0
-        self.alpha = alpha
-        self.iteraciones = iteraciones
-        self.epsilon = epsilon
-        self.eta = eta
-        self.x_historico = [x_0]
-        self.headers = ["Iteración", "x", "Norma"]
-        self.data_grad_simple = []
-        self.data_grad_momentum = []
-
-    
-    def imprimir_tabla_tabulate(self,data, headers):
-        """
-        Imprime una tabla formateada usando la librería tabulate.
-
-        :param headers: Lista con los nombres de las columnas.
-        :param data: Lista de filas, donde cada fila es una lista o tupla de valores.
-        """
-        print(tabulate(data, headers=headers, tablefmt="fancy_grid"))
-
-    def desenso_gradiente_simple(self):
-        f = self.f
-        grad_f = self.grad_f
-        x0 = self.x_0
-        lr = self.alpha
-        max_iters = self.iteraciones
-        epsilon = self.epsilon
-        x_historico = [x0]
-        
-        for i in range(max_iters):
-            f_i = f(*x0)
-            grad_f_i = grad_f(*x0)
-            nomra_grad = np.linalg.norm(grad_f_i)
-            if nomra_grad < epsilon: # Criterio de paro 
-                break
-            xi = x0 - lr * grad_f_i
-            x0 = xi.copy()
-            x_historico.append(x0)
-            self.data_grad_simple.append((i+1, x0.tolist(), nomra_grad))
-            
-        self.imprimir_tabla_tabulate(self.data_grad_simple, self.headers)
-        return x_historico
-
-
-    def desenso_gradiente_momentum(self):
-        f = self.f
-        grad_f = self.grad_f
-        x0 = self.x_0
-        v0 = self.v_0
-        lr = self.alpha
-        eta = self.eta
-        max_iters = self.iteraciones
-        epsilon = self.epsilon
-        x_historico = [x0]
-        
-        for i in range(max_iters):
-            f_i = f(*x0)
-            grad_f_i = grad_f(*x0)
-            nomra_grad = np.linalg.norm(grad_f_i)
-            if nomra_grad < epsilon: # Criterio de paro 
-                break
-            vi = eta * v0 + lr * grad_f_i
-            xi = x0 - vi
-            x0 = xi.copy()
-            v0 = vi.copy()
-            x_historico.append(x0)
-            self.data_grad_momentum.append((i+1, x0.tolist(), nomra_grad))
-            
-        self.imprimir_tabla_tabulate(self.data_grad_momentum, ["Iteración", "x", "Norma", "velocidad"])
-        return x_historico
-        
 # ===================== Funciones =====================
 
-
+# === FUNCIONES DE LA CLASE ===
+# Funciones 1 de la clase
 f1 = lambda x: x**2 + 2*x + 1
 grad_f1 = lambda x: np.array([2*x + 2])
 
@@ -92,7 +16,30 @@ grad_f2 = lambda x1,x2: np.array([2*x1, 4*x2])
 f3 = lambda x1,x2,x3: x1**2 + x2**2 + 2*x3**2
 grad_f3 = lambda x1,x2,x3: np.array([2*x1, 2*x2, 4*x3])
 
-# ================= Función 1 =================
+
+# === FUNCIONES DE TAREA ===
+# Función 1 de tarea
+f1_t = lambda x1, x2: x2**4 + x1**3 + 3*x1**2 + 4*x2**2 - 4*x1*x2 - 5*x2 + 8
+grad_f1_t = lambda x1, x2: np.array([3*x1**2 + 6*x1 - 4*x2, 4*x2**3 + 8*x2 - 4*x1 - 5])
+
+
+# Función 2 de tarea
+f2_t = lambda x1, x2: 2*x1*(x2**2) + 3*np.exp(x1*x2)
+grad_f2_t = lambda x1, x2: np.array([2*(x2**2) + 3*x2*np.exp(x1*x2), 4*x1*x2 + 3*x1*np.exp(x1*x2)])
+
+# Función 3 de tarea
+f3_t = lambda x1, x2, x3: x1**2 + x2**2 + 2*x3**2
+grad_f3_t = lambda x1, x2, x3: np.array([2*x1, 2*x2, 4*x3])
+
+# Función 4 de tarea
+f4_t = lambda x1, x2: np.log(x1**2 + 2*x1*x2 + 3*x2**2)
+grad_f4_t = lambda x1, x2: np.array([ (2*x1 + 2*x2)/(x1**2 + 2*x1*x2 + 3*x2**2),
+                          (2*x1 + 6*x2)/(x1**2 + 2*x1*x2 + 3*x2**2)])
+
+
+
+
+# ================= Función 1 de clase =================
 
 x_0 = np.array([10])
 alpha = 0.1
@@ -107,7 +54,7 @@ f1.desenso_gradiente_simple()
 print("Momentum F1")
 f1.desenso_gradiente_momentum()
 
-# # ================= Función 2 =================
+# ================= Función 2 de clase =================
 
 x_0 = np.array([-5,-2])
 alpha = 0.1
@@ -122,7 +69,7 @@ f2.desenso_gradiente_simple()
 print("Momentum F2")
 f2.desenso_gradiente_momentum()
 
-# # ================= Función 3 =================
+# ================= Función 3 de clase =================
 x_0 = np.array([-1,-1,-1])
 alpha = 0.1
 v_0 = np.array([0,0,0])
@@ -134,3 +81,54 @@ print("FUNCION SIN MOMENTUM")
 f3.desenso_gradiente_simple()
 print("Momentum F3")
 f3.desenso_gradiente_momentum()
+
+
+# ================= Función 1 de tarea =================
+x_0 = np.array([-1,-2])
+alpha = 0.1
+v_0 = np.array([0,0])
+iteraciones = 50
+epsilon = 0.001
+eta = 0.9
+f1_t = Funcion(f1_t,grad_f1_t,x_0,v_0,alpha,iteraciones,epsilon,eta)
+print("FUNCION DE TAREA SIN MOMENTUM")
+f1_t.desenso_gradiente_simple()
+print("Momentum F1 Tarea")
+f1_t.desenso_gradiente_momentum()
+# ================= Función 2 de tarea =================
+x_0 = np.array([-1,-2])
+alpha = 0.1
+v_0 = np.array([0,0])
+iteraciones = 50
+epsilon = 0.001
+eta = 0.9
+f2_t = Funcion(f2_t,grad_f2_t,x_0,v_0,alpha,iteraciones,epsilon,eta)
+print("FUNCION DE TAREA SIN MOMENTUM")
+f2_t.desenso_gradiente_simple()
+print("Momentum F2 Tarea")
+f2_t.desenso_gradiente_momentum()
+# ================= Función 3 de tarea =================
+x_0 = np.array([-1,-2,-3])
+alpha = 0.1
+v_0 = np.array([0,0,0])
+iteraciones = 50
+epsilon = 0.001
+eta = 0.9
+f3_t = Funcion(f3_t,grad_f3_t,x_0,v_0,alpha,iteraciones,epsilon,eta)
+print("FUNCION DE TAREA SIN MOMENTUM")
+f3_t.desenso_gradiente_simple()
+print("Momentum F3 Tarea")
+f3_t.desenso_gradiente_momentum()
+# ================= Función 4 de tarea =================
+x_0 = np.array([-1,-2])
+alpha = 0.1
+v_0 = np.array([0,0])
+iteraciones = 50
+epsilon = 0.001
+eta = 0.9
+f4_t = Funcion(f4_t,grad_f4_t,x_0,v_0,alpha,iteraciones,epsilon,eta)
+print("FUNCION DE TAREA SIN MOMENTUM")
+f4_t.desenso_gradiente_simple()
+print("Momentum F4 Tarea")
+f4_t.desenso_gradiente_momentum()
+print("FIN DE LA EJECUCIÓN")
