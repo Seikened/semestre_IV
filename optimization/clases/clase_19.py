@@ -4,7 +4,7 @@ from colorstreak import log
 import random
 import time
 import  matplotlib.pyplot as plt
-
+from tabulate import tabulate
 
 
 def tiempo_ejec(func):
@@ -80,17 +80,36 @@ def gradiente_regreg_lineal_r2(x_v,y_v,w0,w1, batch = None):
 
 
 
-X,y = generador_datos_2d()
-X = np.array(X)
-y = np.array(y)
-#graficar_regresion(X,y,[3,5])
+# X,y = generador_datos_2d()
+# X = np.array(X)
+# y = np.array(y)
+# #graficar_regresion(X,y,[3,5])
 
 
-grad_w, tiempo_grad = gradiente_regreg_lineal_r2(X, y, 3, 5)
-print(f"Gradiente calculado => grad_w0: {grad_w[0]:.4f}, grad_w1: {grad_w[1]:.4f} | Tiempo de cálculo: {tiempo_grad} seg")
+# grad_w, tiempo_grad = gradiente_regreg_lineal_r2(X, y, 3, 5)
+# print(f"Gradiente calculado => grad_w0: {grad_w[0]:.4f}, grad_w1: {grad_w[1]:.4f} | Tiempo de cálculo: {tiempo_grad} seg")
 
-batches = [n+1 for n in range(100)]
-for batch in batches:
-    w,tiempo = descenso_gradiente_esto_gen(X, y, [3,5], gradiente_regreg_lineal_r2, alpha=0.01, batch_size=batch, max_iter=100) 
-    print(f"\nTamaño del batch {batch}")
-    print(f"Pesos finales obtenidos: w0 = {w[0]:.4f}, w1 = {w[1]:.4f} | Tiempo de ejecución: {tiempo} seg")
+# batches = [n+1 for n in range(100)]
+# for batch in batches:
+#     w,tiempo = descenso_gradiente_esto_gen(X, y, [3,5], gradiente_regreg_lineal_r2, alpha=0.01, batch_size=batch, max_iter=100) 
+#     print(f"\nTamaño del batch {batch}")
+#     print(f"Pesos finales obtenidos: w0 = {w[0]:.4f}, w1 = {w[1]:.4f} | Tiempo de ejecución: {tiempo} seg")
+    
+    
+dataset_sizes = [100, 500, 1000]
+batch_sizes   = [1, 10, 50]           
+iterations    = [50, 100, 200]       
+
+results = []
+for ds in dataset_sizes:
+    X_ds, y_ds = generador_datos_2d(m=ds)
+    X_ds = np.array(X_ds)
+    y_ds = np.array(y_ds)
+    for bs in batch_sizes:
+        for iters in iterations:
+            w_final, tiempo_exec = descenso_gradiente_esto_gen(X_ds, y_ds, [3,5], gradiente_regreg_lineal_r2, alpha=0.01, batch_size=bs, max_iter=iters)
+            results.append([ds, bs, iters, round(w_final[0], 4), round(w_final[1], 4), tiempo_exec])
+
+headers = ["Dataset Size", "Batch Size", "Iterations", "w0", "w1", "Time (s)"]
+print("\nResultados de Experimentos:")
+print(tabulate(results, headers=headers, tablefmt="fancy_grid"))
