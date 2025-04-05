@@ -2,21 +2,15 @@ from qiskit import QuantumCircuit, transpile
 from qiskit_aer import Aer
 from qiskit.visualization import plot_histogram
 import matplotlib.pyplot as plt
+#from qiskit.providers.ibmq import IBMQ
+
 import time
-from dotenv import load_dotenv
 import os
 import qiskit
 
 print(f"Versión de quiskit: {qiskit.__version__}")
 
-load_dotenv()
-IMB_API = os.getenv("IBM_API",None)
-if IMB_API is None:
-    print("No se ha encontrado la variable de entorno IMB_API")
-    raise ValueError("No se ha encontrado la variable de entorno IMB_API")
-else:
-    print("Se ha encontrado la variable de entorno IMB_API")
-    print("La variable de entorno IMB_API es:", IMB_API[:5] + "..." + IMB_API[-5:])
+
 
 
 def medir_tiemo(func):
@@ -62,7 +56,6 @@ def grover_algorithm():
     result = backend.run(compiled, shots=1024).result()
     counts = result.get_counts()
 
-    print("Resultados de Grover:", counts)
     return counts
 
 
@@ -88,4 +81,4 @@ plot_histogram(grover_result)
 plt.title("Histograma de Resultados de Grover")
 plt.xlabel("Estados")
 plt.ylabel("Frecuencia")
-#plt.show()
+plt.show()
