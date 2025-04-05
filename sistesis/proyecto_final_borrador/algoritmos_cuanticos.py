@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 import time
 from dotenv import load_dotenv
 import os
+import qiskit
+
+print(f"Versión de quiskit: {qiskit.__version__}")
 
 load_dotenv()
 IMB_API = os.getenv("IBM_API",None)
@@ -85,4 +88,4 @@ plot_histogram(grover_result)
 plt.title("Histograma de Resultados de Grover")
 plt.xlabel("Estados")
 plt.ylabel("Frecuencia")
-plt.show()
+#plt.show()
