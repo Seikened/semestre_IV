@@ -2,6 +2,7 @@ import numpy as np
 from rich.table import Table
 from rich.console import Console
 import functools
+from dataclasses import dataclass, field
 
 console = Console()
 
@@ -11,7 +12,7 @@ def imprimir_tabla(func):
         resultado = func(self, *args, **kwargs)
         if hasattr(self, 'data'):
             nombre_func = func.__name__
-            headers = []
+
             match nombre_func:
                 case "simple":
                     headers = ["Iteración", "x", "Norma"]
@@ -28,23 +29,23 @@ def imprimir_tabla(func):
         return resultado
     return wrapper
 
-
-class Funcion:
+@dataclass
+class Gradiente:
     """
     Clase que representa una función objetivo y sus métodos de optimización mediante descenso de gradiente.
     Permite aplicar diferentes variantes del descenso de gradiente y visualizar los resultados en tablas.
     """
-    def __init__(self,f,grad_f,x_0,v_0,alpha,iteraciones,epsilon,eta):
-        self.f = f
-        self.grad_f = grad_f
-        self.x_0 = x_0
-        self.v_0 = v_0
-        self.alpha = alpha
-        self.iteraciones = iteraciones
-        self.epsilon = epsilon
-        self.eta = eta
-        self.x_historico = [x_0]
-        self.data = []
+
+    f : callable
+    grad_f : callable
+    x_0 : np.ndarray
+    v_0 : np.ndarray
+    alpha : float
+    iteraciones : int
+    epsilon : float
+    eta : float
+    x_historico : list = field(default_factory=list, init=False)
+    data : list = field(default_factory=list, init=False)
 
     
 
@@ -162,7 +163,7 @@ if __name__ == "__main__":
     epsilon = 1e-6
     eta = 0.9
 
-    funcion = Funcion(f, grad_f, x_0, v_0, alpha, iteraciones, epsilon, eta)
+    funcion = Gradiente(f, grad_f, x_0, v_0, alpha, iteraciones, epsilon, eta)
     funcion.simple()
     funcion.momentum()
     funcion.nesterov()
