@@ -19,9 +19,9 @@ def imprimir_tabla(func):
                     headers = ["Iteración", "x", "Norma", "velocidad"]
                 case "nesterov":
                     headers = ["Iteración", "x", "Norma", "velocidad"]
-            table = Table(title=f"Resultados de {nombre_func.capitalize()}")
+            table = Table(title=f"[bold magenta]Resultados de {nombre_func.capitalize()}[/bold magenta]", show_lines=True)
             for header in headers:
-                table.add_column(header, justify="left", style="cyan", no_wrap=True)
+                table.add_column(header.upper(), justify="center", style="yellow", no_wrap=True)
             for row in self.data:
                 table.add_row(*[str(x) for x in row])
             console.print(table)
