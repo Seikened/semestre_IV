@@ -1,0 +1,2 @@
+from .libreria import Funcion
+
