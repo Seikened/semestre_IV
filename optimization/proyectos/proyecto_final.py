@@ -162,6 +162,7 @@ class Gradiente:
         max_iters = self.iteraciones
         epsilon = self.epsilon
         self.x_historico = [x0]
+        chico = []
         
         for i in range(max_iters):
             lookahead = x0 - eta * v0
@@ -175,7 +176,12 @@ class Gradiente:
             v0 = vi.copy()
             self.x_historico.append(x0)
             self.data.append((i+1, x0.tolist(), norm_grad, vi.tolist()))
+            chico.append(norm_grad)
             log.info(f"Iteración {i+1}: x0 = {x0}, grad_f = {grad_f_i}, norma_grad = {norm_grad}")
+        mas_chico = min(chico)
+        iteracion_mas_chico = chico.index(mas_chico) + 1
+        log.info(f"Iteración con menor norma del gradiente: en la iteración: {iteracion_mas_chico} con valor {mas_chico}")
+        
         return self.x_historico
 
 
@@ -219,47 +225,86 @@ class Imagen:
     def img_vector(self) -> np.ndarray:
         return self.imagen.flatten()
 
+# =============================================== Energía L2 (λ‖∇u‖²) ===========================================================
+class EnergiaL2:
+    """
+    Encapsula la energía
 
+        J(u) = 0.5‖u - f‖² + 0.5·λ‖∇u‖²
+
+    y su gradiente discreto usando el laplaciano de cinco puntos.
+    Trabaja con vectores planos (`u_vec`) para ser compatible con la
+    clase Gradiente y realiza el reshape internamente.
+    """
+    def __init__(self, f_img: np.ndarray, lam: float = 0.2):
+        self.f_img = f_img.astype(np.float32)
+        self.lam   = float(lam)
+        self.H, self.W = self.f_img.shape
+        self.f_vec = self.f_img.flatten()
+
+    # ---------- helpers ----------
+    def _laplaciano(self, u_vec: np.ndarray) -> np.ndarray:
+        """Laplaciano discreto de 5 puntos sobre la imagen 2‑D."""
+        u = u_vec.reshape(self.H, self.W)
+        lap = (
+            -4.0 * u +
+            np.roll(u,  1, 0) + np.roll(u, -1, 0) +
+            np.roll(u,  1, 1) + np.roll(u, -1, 1)
+        )
+        return lap.flatten()
+
+    # ---------- API requerida por Gradiente ----------
+    def func(self, u_vec: np.ndarray) -> float:
+        """Devuelve J(u)."""
+        diff = u_vec - self.f_vec
+        lap  = self._laplaciano(u_vec)
+        return 0.5 * np.dot(diff, diff) + 0.5 * self.lam * np.dot(lap, lap)
+
+    def grad(self, u_vec: np.ndarray) -> np.ndarray:
+        """Devuelve ∇J(u)."""
+        #   ∇J(u) = (u - f) - λ Δu   (signo menos: ecuaciones de Euler‑Lagrange)
+        return (u_vec - self.f_vec) - self.lam * self._laplaciano(u_vec)
 
 
 # ================================================ PROYECTO FINAL ===========================================================
-#inicializador()
 
 
-# Ejemplo de uso
-# f = lambda x, y: (x-1)**2 + (y-2)**2
-# grad_f = lambda x, y: np.array([2*(x-1), 2*(y-2)])
-# x_0 = np.array([0.0, 0.0])
-# v_0 = np.array([0.0, 0.0])
-# alpha = 0.1
-# iteraciones = 10
-# epsilon = 1e-6
-# eta = 0.9
+# ==================== Ejemplo de uso (actualizado) ====================
 
-# funcion = Gradiente(f, grad_f, x_0, v_0, alpha, iteraciones, epsilon, eta)
-# funcion.simple()
-# funcion.momentum()
-# funcion.nesterov()
-
-funcion_objetivo = lambda u,f,λ,u_grad: ( 0.5 * (abs(u - f)**2) ) + ((λ/2) * (abs(u_grad)**2) )
-
-
-
-# # Ejemplo de uso
 ruta_base = '/Users/ferleon/Documents/GitHub/semestre_IV/optimization/proyectos/'
-ruta_img = ruta_base + 'fer.jpeg'
-ruta_img = ruta_base + 'F.png'
-ruta_img = ruta_base + 'men_moon.jpg'
+ruta_img  = ruta_base + 'men_moon.jpg'   # ajusta a la imagen que quieras
 
+# --- 1. Cargar la imagen y generar versión ruidosa ---
+imagen_original = Imagen(ruta_img)
+log.info(f"Imagen original: {imagen_original.ancho}x{imagen_original.alto}")
 
-imagen = Imagen(ruta_img)
-log.info(f"Imagen tamaño: {imagen.ancho}x{imagen.alto}")
-imagen.cambiar_tam(imagen.ancho // 4, imagen.alto // 4)
-log.info(f"Imagen tamaño: {imagen.ancho}x{imagen.alto}")
+# Redimensionar para pruebas rápidas
+imagen_original.cambiar_tam(imagen_original.ancho // 4, imagen_original.alto // 4)
+f_img = imagen_original.imagen.astype(np.float32)
 
+# Crear copia ruidosa para el experimento
+imagen_ruido = Imagen(ruta_img)
+imagen_ruido.cambiar_tam(imagen_ruido.ancho // 4, imagen_ruido.alto // 4)
+imagen_ruido.aplicar_ruido_al_pixel(25)               # σ = 25
+f_noisy = imagen_ruido.imagen.astype(np.float32)
+cv2.imwrite(ruta_base + 'imagen_ruido.png', f_noisy)
 
+# --- 2. Construir problema de energía L2 ---
+energia = EnergiaL2(f_noisy, lam=0.2)                 # λ = 0.2 (ajusta a gusto)
 
-imagen.guardar_img(ruta_base + 'imagen_original.png')
-imagen.aplicar_ruido_al_pixel(25)
-imagen.guardar_img(ruta_base + 'imagen_ruido.png')
+# --- 3. Ejecutar optimizador ---
+opt = Gradiente(
+    f       = energia.func,
+    grad_f  = energia.grad,
+    x_0     = energia.f_vec.copy(),                   # inicialización = imagen ruidosa
+    v_0     = np.zeros_like(energia.f_vec),
+    #alpha   = 5e-4,
+    alpha   = 3e-2,                                   
+    iteraciones = 1500,
+    epsilon = 1e-6,
+    eta     = 0.8
+)
 
+opt.nesterov()                                        # también .momentum() o .simple()
+u_final = opt.x_historico[-1].reshape(energia.H, energia.W).astype(np.uint8)
+cv2.imwrite(ruta_base + 'imagen_denoise.png', u_final)
