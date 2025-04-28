@@ -1,7 +1,37 @@
+import subprocess
+import sys
+try:
+    from mathkat import Gradiente
+    from colorstreak import log
+    import numpy as np
+except ImportError:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "mathkat"])
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "colorstreak"])
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "numpy"])
+    from mathkat import Gradiente 
+    from colorstreak import log
+    import numpy as np
 
-import numpy as np
+def inicializador():
+    log.info('LAS LIBRERIAS "mathkat", "colorstreak"  son mias puedes consultarlo con el comando "pip show mathkat" y "pip show colorstreak"')
+    respuesta = input('Quieres comprobar que son mias? (s/n): ')
+    if respuesta.lower() == 's':
+        subprocess.check_call([sys.executable, "-m", "pip", "show", "mathkat"])
+        subprocess.check_call([sys.executable, "-m", "pip", "show", "colorstreak"])
+        respuesta = input('Quieres contuinuar? (s/n): ')
+        if respuesta.lower() == 's':
+            log.info('Continuando...')
+        else:
+            log.info('Saliendo...')
+            sys.exit()
+    else:
+        log.info('Continuando...')
 
 
+
+
+# ================================================ PROYECTO FINAL ===========================================================
+inicializador()
 
 
 # Ejemplo de uso
