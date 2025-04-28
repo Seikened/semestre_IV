@@ -299,9 +299,9 @@ opt = Gradiente(
     x_0     = energia.f_vec.copy(),                   # inicialización = imagen ruidosa
     v_0     = np.zeros_like(energia.f_vec),
     #alpha   = 5e-4,
-    alpha   = 3e-2,                                   
+    alpha   = 4e-2,                                   
     iteraciones = 1500,
-    epsilon = 1e-6,
+    epsilon = 1e-5,
     eta     = 0.8
 )
 
