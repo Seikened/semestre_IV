@@ -2,16 +2,15 @@
 from colorstreak import log
 import numpy as np
 import cv2
-from dataclasses import dataclass , field
-
-
-# ================================================ Gradiente temporar (borrar despues de las pruebas) ===========================================================
-
-import numpy as np
 from rich.table import Table
 from rich.console import Console
 import functools
 from dataclasses import dataclass, field
+
+
+# ================================================ Gradiente temporar (borrar despues de las pruebas) ===========================================================
+
+
 
 console = Console()
 
@@ -56,6 +55,15 @@ class Gradiente:
     x_historico : list = field(default_factory=list, init=False)
     data : list = field(default_factory=list, init=False)
 
+    @staticmethod
+    def _desempaquetar(func, x_0):
+        try:
+            return func(*x_0)
+        except TypeError:
+            return func(x_0)
+
+        
+
     def reset(self):
         """
         Reinicia el historial de posiciones y datos.
@@ -64,7 +72,7 @@ class Gradiente:
         self.data = []
     
 
-    @imprimir_tabla
+    #@imprimir_tabla
     def simple(self):
         """
         Realiza el descenso de gradiente estándar para minimizar la función objetivo.
@@ -84,19 +92,20 @@ class Gradiente:
         self.x_historico = [x0]
         
         for i in range(max_iters):
-            f_i = f(*x0)
-            grad_f_i = grad_f(*x0)
-            nomra_grad = np.linalg.norm(grad_f_i)
-            if nomra_grad < epsilon: 
+            f_i = self._desempaquetar(f, x0)
+            grad_f_i = self._desempaquetar(grad_f, x0)
+            norm_grad = np.linalg.norm(grad_f_i)
+            if norm_grad < epsilon: 
                 break
             xi = x0 - lr * grad_f_i
             x0 = xi.copy()
+            log.info(f"Iteración {i+1}: x0 = {x0}, grad_f = {grad_f_i}, norma_grad = {norm_grad}")
             self.x_historico.append(x0)
-            self.data.append((i+1, x0.tolist(), nomra_grad))
+            self.data.append((i+1, x0.tolist(), norm_grad))
         return self.x_historico
 
 
-    @imprimir_tabla
+    #@imprimir_tabla
     def momentum(self):
         """
         Aplica el método de descenso de gradiente con momentum para minimizar la función objetivo.
@@ -118,21 +127,22 @@ class Gradiente:
         self.x_historico = [x0]
         
         for i in range(max_iters):
-            f_i = f(*x0)
-            grad_f_i = grad_f(*x0)
-            nomra_grad = np.linalg.norm(grad_f_i)
-            if nomra_grad < epsilon: # Criterio de paro 
+            f_i = self._desempaquetar(f, x0)
+            grad_f_i = self._desempaquetar(grad_f, x0)
+            norma_grad = np.linalg.norm(grad_f_i)
+            if norma_grad < epsilon:
                 break
             vi = eta * v0 + lr * grad_f_i
             xi = x0 - vi
             x0 = xi.copy()
             v0 = vi.copy()
             self.x_historico.append(x0)
-            self.data.append((i+1, x0.tolist(), nomra_grad, vi.tolist()))
+            self.data.append((i+1, x0.tolist(), norma_grad, vi.tolist()))
+            log.info(f"Iteración {i+1}: x0 = {x0}, grad_f = {grad_f_i}, norma_grad = {norma_grad}, velocidad = {vi}")
         return self.x_historico
     
     
-    @imprimir_tabla
+    #@imprimir_tabla
     def nesterov(self):
         """
         Aplica el método de descenso de gradiente con Nesterov para minimizar la función objetivo.
@@ -151,12 +161,11 @@ class Gradiente:
         eta = self.eta
         max_iters = self.iteraciones
         epsilon = self.epsilon
-        x_historico = [x0]
-        data_grad_nesterov = []
+        self.x_historico = [x0]
         
         for i in range(max_iters):
             lookahead = x0 - eta * v0
-            grad_f_i = grad_f(*lookahead)
+            grad_f_i = self._desempaquetar(grad_f, lookahead)
             norm_grad = np.linalg.norm(grad_f_i)
             if norm_grad < epsilon:
                 break
@@ -166,6 +175,7 @@ class Gradiente:
             v0 = vi.copy()
             self.x_historico.append(x0)
             self.data.append((i+1, x0.tolist(), norm_grad, vi.tolist()))
+            log.info(f"Iteración {i+1}: x0 = {x0}, grad_f = {grad_f_i}, norma_grad = {norm_grad}")
         return self.x_historico
 
 
@@ -201,23 +211,13 @@ class Imagen:
         cv2.imwrite(nueva_ruta, self.imagen)
 
     def aplicar_ruido_al_pixel(self, sigma: float = 60.0, mean: float = 0.0):
-        """
-        Agrega ruido gaussiano aditivo controlando media y desviación estándar.
-        El resultado se satura al rango [0, 255] y se almacena de nuevo en self.imagen.
-
-        Parámetros
-        ----------
-        sigma : float
-            Desviación estándar del ruido (cuanto mayor, más intenso).
-        mean : float
-            Media del ruido; normalmente 0.
-        """
-        # Trabajamos en int16 para evitar overflow en la suma
         ruido = np.random.normal(mean, sigma, self.imagen.shape).astype(np.int16)
         noisy = self.imagen.astype(np.int16) + ruido
         noisy = np.clip(noisy, 0, 255).astype(np.uint8)
         self.imagen = noisy
 
+    def img_vector(self) -> np.ndarray:
+        return self.imagen.flatten()
 
 
 
@@ -227,19 +227,19 @@ class Imagen:
 
 
 # Ejemplo de uso
-f = lambda x, y: (x-1)**2 + (y-2)**2
-grad_f = lambda x, y: np.array([2*(x-1), 2*(y-2)])
-x_0 = np.array([0.0, 0.0])
-v_0 = np.array([0.0, 0.0])
-alpha = 0.1
-iteraciones = 10
-epsilon = 1e-6
-eta = 0.9
+# f = lambda x, y: (x-1)**2 + (y-2)**2
+# grad_f = lambda x, y: np.array([2*(x-1), 2*(y-2)])
+# x_0 = np.array([0.0, 0.0])
+# v_0 = np.array([0.0, 0.0])
+# alpha = 0.1
+# iteraciones = 10
+# epsilon = 1e-6
+# eta = 0.9
 
-funcion = Gradiente(f, grad_f, x_0, v_0, alpha, iteraciones, epsilon, eta)
-funcion.simple()
-funcion.momentum()
-funcion.nesterov()
+# funcion = Gradiente(f, grad_f, x_0, v_0, alpha, iteraciones, epsilon, eta)
+# funcion.simple()
+# funcion.momentum()
+# funcion.nesterov()
 
 funcion_objetivo = lambda u,f,λ,u_grad: ( 0.5 * (abs(u - f)**2) ) + ((λ/2) * (abs(u_grad)**2) )
 
@@ -251,8 +251,15 @@ ruta_img = ruta_base + 'fer.jpeg'
 ruta_img = ruta_base + 'F.png'
 ruta_img = ruta_base + 'men_moon.jpg'
 
-imagen = Imagen(ruta_img)
-#imagen.mostrar()
 
+imagen = Imagen(ruta_img)
+log.info(f"Imagen tamaño: {imagen.ancho}x{imagen.alto}")
+imagen.cambiar_tam(imagen.ancho // 4, imagen.alto // 4)
+log.info(f"Imagen tamaño: {imagen.ancho}x{imagen.alto}")
+
+
+
+imagen.guardar_img(ruta_base + 'imagen_original.png')
 imagen.aplicar_ruido_al_pixel(25)
-#imagen.mostrar()
+imagen.guardar_img(ruta_base + 'imagen_ruido.png')
+
