@@ -1,37 +1,7 @@
-import subprocess
-import sys
-try:
-    from mathkat import Gradiente
-    from colorstreak import log
-    import numpy as np
-    from PIL import Image, ImageFilter
-
-except ImportError:
-
-    librerias_faltantes = ['mathkat', 'colorstreak', 'numpy', 'Pillow']
-    subprocess.check_call([sys.executable, "-m", "pip", "install", *librerias_faltantes]) 
-    from mathkat import Gradiente 
-    from colorstreak import log
-    import numpy as np
-    from PIL import Image, ImageFilter
-
-def inicializador():
-    log.info('LAS LIBRERIAS "mathkat", "colorstreak"  son mias puedes consultarlo con el comando "pip show mathkat" y "pip show colorstreak"')
-    respuesta = input('Quieres comprobar que son mias? (s/n): ')
-    if respuesta.lower() == 's':
-        subprocess.check_call([sys.executable, "-m", "pip", "show", "mathkat"])
-        subprocess.check_call([sys.executable, "-m", "pip", "show", "colorstreak"])
-        respuesta = input('Quieres contuinuar? (s/n): ')
-        if respuesta.lower() == 's':
-            log.info('Continuando...')
-        else:
-            log.info('Saliendo...')
-            sys.exit()
-    else:
-        log.info('Continuando...')
-
-
-
+from mathkat import Gradiente 
+from colorstreak import log
+import numpy as np
+import cv2
 from dataclasses import dataclass , field
 
 @dataclass
@@ -43,28 +13,43 @@ class Imagen:
 
     def __post_init__(self):
         self.cargar_imagen()
-        log.info(f'Imagen cargada: {self.ruta}')
-        log.info(f'Tamaño de la imagen: {self.ancho}x{self.alto}')
     
     
     def cargar_imagen(self):
-
-        self.imagen = Image.open(self.ruta)
-        self.ancho, self.alto = self.imagen.size
+        self.imagen = cv2.imread(self.ruta, cv2.IMREAD_GRAYSCALE)
+        if self.imagen is None:
+            raise FileNotFoundError(f"No se pudo cargar la imagen en {self.ruta}")
+        self.alto, self.ancho = self.imagen.shape
 
     def mostrar(self):
-        self.imagen.show()
+        cv2.imshow('Imagen', self.imagen)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
     def cambiar_tam(self, nuevo_ancho, nuevo_alto):
-        self.imagen = self.imagen.resize((nuevo_ancho, nuevo_alto))
-        self.ancho, self.alto = self.imagen.size
+        self.imagen = cv2.resize(self.imagen, (nuevo_ancho, nuevo_alto), interpolation=cv2.INTER_AREA)
+        self.ancho, self.alto = nuevo_ancho, nuevo_alto
 
     def guardar_img(self, nueva_ruta):
-        self.imagen.save(nueva_ruta)
+        cv2.imwrite(nueva_ruta, self.imagen)
 
-    def aplicar_ruido_al_pixel(self, ruido):
-        
-        self.imagen = self.imagen.filter(ImageFilter.GaussianBlur(ruido))
+    def aplicar_ruido_al_pixel(self, sigma: float = 60.0, mean: float = 0.0):
+        """
+        Agrega ruido gaussiano aditivo controlando media y desviación estándar.
+        El resultado se satura al rango [0, 255] y se almacena de nuevo en self.imagen.
+
+        Parámetros
+        ----------
+        sigma : float
+            Desviación estándar del ruido (cuanto mayor, más intenso).
+        mean : float
+            Media del ruido; normalmente 0.
+        """
+        # Trabajamos en int16 para evitar overflow en la suma
+        ruido = np.random.normal(mean, sigma, self.imagen.shape).astype(np.int16)
+        noisy = self.imagen.astype(np.int16) + ruido
+        noisy = np.clip(noisy, 0, 255).astype(np.uint8)
+        self.imagen = noisy
 
 
 
@@ -89,7 +74,6 @@ class Imagen:
 # funcion.momentum()
 # funcion.nesterov()
 
-
 funcion_objetivo = lambda u,f,λ,u_grad: ( 0.5 * (abs(u - f)**2) ) + ((λ/2) * (abs(u_grad)**2) )
 
 
@@ -97,6 +81,11 @@ funcion_objetivo = lambda u,f,λ,u_grad: ( 0.5 * (abs(u - f)**2) ) + ((λ/2) * (
 # # Ejemplo de uso
 ruta_base = '/Users/ferleon/Documents/GitHub/semestre_IV/optimization/proyectos/'
 ruta_img = ruta_base + 'fer.jpeg'
-imagen = Imagen(ruta_img)
+ruta_img = ruta_base + 'F.png'
+ruta_img = ruta_base + 'men_moon.jpg'
 
-imagen.aplicar_ruido_al_pixel(3)
+imagen = Imagen(ruta_img)
+imagen.mostrar()
+
+imagen.aplicar_ruido_al_pixel(25)
+imagen.mostrar()
