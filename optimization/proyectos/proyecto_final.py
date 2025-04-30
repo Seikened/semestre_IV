@@ -272,39 +272,34 @@ class EnergiaL2:
 # ==================== Ejemplo de uso (actualizado) ====================
 
 ruta_base = '/Users/ferleon/Documents/GitHub/semestre_IV/optimization/proyectos/'
-ruta_img  = ruta_base + 'men_moon.jpg'   # ajusta a la imagen que quieras
+ruta_img  = ruta_base + 'men_moon.jpg'   
 
-# --- 1. Cargar la imagen y generar versión ruidosa ---
 imagen_original = Imagen(ruta_img)
 log.info(f"Imagen original: {imagen_original.ancho}x{imagen_original.alto}")
 
-# Redimensionar para pruebas rápidas
 imagen_original.cambiar_tam(imagen_original.ancho // 4, imagen_original.alto // 4)
 f_img = imagen_original.imagen.astype(np.float32)
 
-# Crear copia ruidosa para el experimento
 imagen_ruido = Imagen(ruta_img)
 imagen_ruido.cambiar_tam(imagen_ruido.ancho // 4, imagen_ruido.alto // 4)
-imagen_ruido.aplicar_ruido_al_pixel(25)               # σ = 25
+imagen_ruido.aplicar_ruido_al_pixel(25)              
 f_noisy = imagen_ruido.imagen.astype(np.float32)
 cv2.imwrite(ruta_base + 'imagen_ruido.png', f_noisy)
 
-# --- 2. Construir problema de energía L2 ---
-energia = EnergiaL2(f_noisy, lam=0.2)                 # λ = 0.2 (ajusta a gusto)
+energia = EnergiaL2(f_noisy, lam=0.2)
 
 # --- 3. Ejecutar optimizador ---
-opt = Gradiente(
+gradiente = Gradiente(
     f       = energia.func,
     grad_f  = energia.grad,
-    x_0     = energia.f_vec.copy(),                   # inicialización = imagen ruidosa
+    x_0     = energia.f_vec.copy(),
     v_0     = np.zeros_like(energia.f_vec),
-    #alpha   = 5e-4,
     alpha   = 2e-2,                                   
     iteraciones = 1500,
     epsilon = 1e-6,
     eta     = 0.8
 )
 
-opt.nesterov()                                        # también .momentum() o .simple()
-u_final = opt.x_historico[-1].reshape(energia.H, energia.W).astype(np.uint8)
+gradiente.nesterov()
+u_final = gradiente.x_historico[-1].reshape(energia.H, energia.W).astype(np.uint8)
 cv2.imwrite(ruta_base + 'imagen_denoise.png', u_final)
