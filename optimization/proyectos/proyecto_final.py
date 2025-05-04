@@ -222,7 +222,7 @@ class Imagen:
         noisy = np.clip(noisy, 0, 255).astype(np.uint8)
         self.imagen = noisy
 
-    def img_vector(self) -> np.ndarray:
+    def img_vector(self):
         return self.imagen.flatten()
 
 # =============================================== Energía L2 (λ‖∇u‖²) ===========================================================
@@ -243,7 +243,7 @@ class EnergiaL2:
         self.f_vec = self.f_img.flatten()
 
     # ---------- helpers ----------
-    def _laplaciano(self, u_vec: np.ndarray) -> np.ndarray:
+    def _laplaciano(self, u_vec: np.ndarray):
         """Laplaciano discreto de 5 puntos sobre la imagen 2‑D."""
         u = u_vec.reshape(self.H, self.W)
         lap = (
@@ -254,13 +254,13 @@ class EnergiaL2:
         return lap.flatten()
 
     # ---------- API requerida por Gradiente ----------
-    def func(self, u_vec: np.ndarray) -> float:
+    def func(self, u_vec: np.ndarray):
         """Devuelve J(u)."""
         diff = u_vec - self.f_vec
         lap  = self._laplaciano(u_vec)
         return 0.5 * np.dot(diff, diff) + 0.5 * self.lam * np.dot(lap, lap)
 
-    def grad(self, u_vec: np.ndarray) -> np.ndarray:
+    def grad(self, u_vec: np.ndarray):
         """Devuelve ∇J(u)."""
         #   ∇J(u) = (u - f) - λ Δu   (signo menos: ecuaciones de Euler‑Lagrange)
         return (u_vec - self.f_vec) - self.lam * self._laplaciano(u_vec)
