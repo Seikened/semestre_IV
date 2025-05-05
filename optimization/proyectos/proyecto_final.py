@@ -217,9 +217,9 @@ class Imagen:
         cv2.imwrite(nueva_ruta, self.imagen)
 
     def aplicar_ruido_al_pixel(self, sigma: float = 60.0, mean: float = 0.0):
-        ruido = np.random.normal(mean, sigma, self.imagen.shape).astype(np.int16)
-        noisy = self.imagen.astype(np.int16) + ruido
-        noisy = np.clip(noisy, 0, 255).astype(np.uint8)
+        ruido = np.random.normal(mean, sigma, self.imagen.shape)
+        noisy = self.imagen + ruido
+        #noisy = np.clip(noisy, 0, 255).astype(np.uint8)
         self.imagen = noisy
 
     def img_vector(self):
@@ -301,5 +301,5 @@ gradiente = Gradiente(
 )
 
 gradiente.nesterov()
-u_final = gradiente.x_historico[-1].reshape(energia.H, energia.W).astype(np.uint8)
+u_final = gradiente.x_historico[-1].reshape(energia.H, energia.W)
 cv2.imwrite(ruta_base + 'imagen_denoise.png', u_final)

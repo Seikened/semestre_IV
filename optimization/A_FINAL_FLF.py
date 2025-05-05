@@ -10,7 +10,7 @@ from colorstreak import log
 func = lambda x, y: (((x**2) + y - 11)**2) + ((x + (y**2) - 7)**2)
 
 rango = 4
-n_numeros = 10
+n_numeros = 100
 x = np.linspace(-rango, rango, n_numeros)
 y = np.linspace(-rango, rango, n_numeros)
 
@@ -19,11 +19,9 @@ f_dev_x = elementwise_grad(func)
 f_dev_y = elementwise_grad(func)
 
 
-
 # Segundas derivadas parciales
 f2_dev_x = elementwise_grad(f_dev_x)
 f2_dev_y = elementwise_grad(f_dev_y)
-
 
 
 # Hessian
@@ -49,6 +47,6 @@ for x,y in zip(x,y):
     if minimo_cond(x) == "min":
         minimos.append([x,y])
 
-
+print(f"Se obtuvieron {len(minimos)}")
 for x,y in minimos:
     log.warning(f"Mínimo en  X:{x:1f} | Y:{y:1f}")
