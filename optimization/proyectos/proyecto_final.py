@@ -1,4 +1,4 @@
-#from mathkat import Gradiente 
+from mathkat import Gradiente 
 from colorstreak import log
 import numpy as np
 import cv2
@@ -260,7 +260,7 @@ ruta_img  = ruta_base + 'men_moon.jpg'
 imagen_original = Imagen(ruta_img)
 log.info(f"Imagen original: {imagen_original.ancho}x{imagen_original.alto}")
 
-reductor = 2
+reductor = 10
 
 imagen_original.cambiar_tam(imagen_original.ancho // reductor, imagen_original.alto // reductor)
 f_img = imagen_original.imagen.astype(np.float32)
