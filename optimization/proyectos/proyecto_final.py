@@ -1,10 +1,20 @@
-from mathkat import Gradiente 
+#from mathkat import Gradiente 
 from colorstreak import log
 import numpy as np
 import cv2
 from rich.console import Console
 from dataclasses import dataclass, field
 import matplotlib.pyplot as plt
+from skimage.metrics import structural_similarity as ssim
+from numba import jit
+
+
+def psnr(img1, img2, max_pixel: float = 255.0) -> float:
+    """Calcula PSNR (dB) entre dos imágenes."""
+    mse = np.mean((img1 - img2) ** 2)
+    if mse == 0:
+        return float("inf")
+    return 20 * np.log10(max_pixel / np.sqrt(mse))
 
 
 # ================================================ Gradiente temporar (borrar despues de las pruebas) ===========================================================
@@ -48,7 +58,7 @@ class Gradiente:
         self.data = []
     
 
-    #@imprimir_tabla
+    @jit(nopython=True, cache=True)
     def simple(self):
         """
         Realiza el descenso de gradiente estándar para minimizar la función objetivo.
@@ -76,7 +86,7 @@ class Gradiente:
                 break
             xi = x0 - lr * grad_f_i
             x0 = xi.copy()
-            log.info(f"Iteración {i+1}: x0 = {x0}, grad_f = {grad_f_i}, norma_grad = {norm_grad}")
+            print(f"Iteración {i+1}: x0 = {x0}, grad_f = {grad_f_i}, norma_grad = {norm_grad}")
             self.x_historico.append(x0)
             self.data.append((i+1, x0.tolist(), norm_grad))
             chico.append(norm_grad)
@@ -85,7 +95,7 @@ class Gradiente:
         return self.x_historico
 
 
-    #@imprimir_tabla
+    @jit(nopython=True, cache=True)
     def momentum(self):
         """
         Aplica el método de descenso de gradiente con momentum para minimizar la función objetivo.
@@ -119,13 +129,13 @@ class Gradiente:
             self.x_historico.append(x0)
             chico.append(norma_grad)
             self.data.append((i+1, x0.tolist(), norma_grad, vi.tolist()))
-            log.info(f"Iteración {i+1}: x0 = {x0}, grad_f = {grad_f_i}, norma_grad = {norma_grad}, velocidad = {vi}")
+            print(f"Iteración {i+1}: x0 = {x0}, grad_f = {grad_f_i}, norma_grad = {norma_grad}, velocidad = {vi}")
         self.mas_chico = min(chico)
         self.iteracion_mas_chico = chico.index(self.mas_chico) + 1
         return self.x_historico
     
     
-    #@imprimir_tabla
+    @jit(nopython=True, cache=True)
     def nesterov(self):
         """
         Aplica el método de descenso de gradiente con Nesterov para minimizar la función objetivo.
@@ -160,12 +170,13 @@ class Gradiente:
             self.x_historico.append(x0)
             self.data.append((i+1, x0.tolist(), norm_grad, vi.tolist()))
             chico.append(norm_grad)
-            log.info(f"Iteración {i+1}: x0 = {x0}, grad_f = {grad_f_i}, norma_grad = {norm_grad}")
+            print(f"Iteración {i+1}: x0 = {x0}, grad_f = {grad_f_i}, norma_grad = {norm_grad}")
         self.mas_chico = min(chico)
         self.iteracion_mas_chico = chico.index(self.mas_chico) + 1
-        log.info(f"Iteración con menor norma del gradiente: en la iteración: {self.iteracion_mas_chico} con valor {self.mas_chico}")
+        print(f"Iteración con menor norma del gradiente: en la iteración: {self.iteracion_mas_chico} con valor {self.mas_chico}")
         
         return self.x_historico
+
 
 
 
@@ -258,95 +269,126 @@ ruta_base = '/Users/ferleon/Documents/GitHub/semestre_IV/optimization/proyectos/
 ruta_img  = ruta_base + 'men_moon.jpg'   
 
 imagen_original = Imagen(ruta_img)
-log.info(f"Imagen original: {imagen_original.ancho}x{imagen_original.alto}")
+print(f"Imagen original: {imagen_original.ancho}x{imagen_original.alto}")
 
 reductor = 10
 
 imagen_original.cambiar_tam(imagen_original.ancho // reductor, imagen_original.alto // reductor)
+# Array de imagen original redimensionada para métricas/plots
+img_original = imagen_original.imagen.copy()
 f_img = imagen_original.imagen.astype(np.float32)
 
 imagen_ruido = Imagen(ruta_img)
 imagen_ruido.cambiar_tam(imagen_ruido.ancho // reductor, imagen_ruido.alto // reductor)
-imagen_ruido.aplicar_ruido_al_pixel(25)              
-f_noisy = imagen_ruido.imagen.astype(np.float32)
-cv2.imwrite(ruta_base + 'imagen_ruido.png', f_noisy)
 
-energia = EnergiaL2(f_noisy, lam=0.2)
+for ruido in [0, 10, 20, 30, 40, 50]:
+    imagen_ruido.aplicar_ruido_al_pixel(ruido)         
+    f_noisy = imagen_ruido.imagen.astype(np.float32)
+    cv2.imwrite(ruta_base + f'imagen_ruido_{ruido}.png', f_noisy)
 
-gradiente = Gradiente(
-    f       = energia.func,
-    grad_f  = energia.grad,
-    x_0     = energia.f_vec.copy(),
-    v_0     = np.zeros_like(energia.f_vec),
-    alpha   = 2e-2,                                   
-    iteraciones = 1500,
-    epsilon = 1e-6,
-    eta     = 0.8
-)
+    energia = EnergiaL2(f_noisy, lam=0.2)
 
-
-metodo = 'nesterov' 
-grad_nesterov = gradiente.nesterov()
-min_nesterov = gradiente.mas_chico
-iter_nesterov = gradiente.iteracion_mas_chico
-foto_nesterov = gradiente.x_historico[-1].reshape(energia.H, energia.W)
-cv2.imwrite(ruta_base + f'imagen_denoise_{metodo}.png', foto_nesterov)
-print(f"Imagen con nesterov guardada como imagen_denoise_{metodo}.png")
+    gradiente = Gradiente(
+        f       = energia.func,
+        grad_f  = energia.grad,
+        x_0     = energia.f_vec.copy(),
+        v_0     = np.zeros_like(energia.f_vec),
+        alpha   = 2e-2,                                   
+        iteraciones = 1500,
+        epsilon = 1e-6,
+        eta     = 0.8
+    )
 
 
-metodo = 'momentum'
-grad_momentum = gradiente.momentum()
-min_momentum = gradiente.mas_chico
-iter_momentum = gradiente.iteracion_mas_chico
-foto_momentum = gradiente.x_historico[-1].reshape(energia.H, energia.W)
-cv2.imwrite(ruta_base + f'imagen_denoise_{metodo}.png', foto_momentum)
-print(f"Imagen con momentum guardada como imagen_denoise_{metodo}.png")
+    metodo = 'nesterov' 
+    grad_nesterov = gradiente.nesterov()
+    min_nesterov = gradiente.mas_chico
+    iter_nesterov = gradiente.iteracion_mas_chico
+    foto_nesterov = gradiente.x_historico[-1].reshape(energia.H, energia.W)
+    cv2.imwrite(ruta_base + f'imagen_denoise_{metodo}.png', foto_nesterov)
+    print(f"Imagen con nesterov guardada como imagen_denoise_{metodo}.png")
 
 
-metodo = 'simple'
-grad_simple = gradiente.simple()
-min_simple = gradiente.mas_chico
-iter_simple = gradiente.iteracion_mas_chico
-foto_simple = gradiente.x_historico[-1].reshape(energia.H, energia.W)
-cv2.imwrite(ruta_base + f'imagen_denoise_{metodo}.png', foto_simple)
-print(f"Imagen con simple guardada como imagen_denoise_{metodo}.png")
+    metodo = 'momentum'
+    grad_momentum = gradiente.momentum()
+    min_momentum = gradiente.mas_chico
+    iter_momentum = gradiente.iteracion_mas_chico
+    foto_momentum = gradiente.x_historico[-1].reshape(energia.H, energia.W)
+    cv2.imwrite(ruta_base + f'imagen_denoise_{metodo}.png', foto_momentum)
+    print(f"Imagen con momentum guardada como imagen_denoise_{metodo}.png")
 
-# Mostrar las imágenes en 3 filas: original, ruido, restaurada (simple, momentum, nesterov)
-fig, axs = plt.subplots(3, 3, figsize=(12, 12))
 
-# Leer imágenes restauradas
-img_original = imagen_original.imagen
-img_ruido = imagen_ruido.imagen
-img_simple = foto_simple
-img_momentum = foto_momentum
-img_nesterov = foto_nesterov
-
-# Iteraciones alcanzadas para cada método
+    metodo = 'simple'
+    grad_simple = gradiente.simple()
+    min_simple = gradiente.mas_chico
+    iter_simple = gradiente.iteracion_mas_chico
+    foto_simple = gradiente.x_historico[-1].reshape(energia.H, energia.W)
+    cv2.imwrite(ruta_base + f'imagen_denoise_{metodo}.png', foto_simple)
+    print(f"Imagen con simple guardada como imagen_denoise_{metodo}.png")
 
 
 
-# Fila 1: Imagen original
-for j, metodo in enumerate(['simple', 'momentum', 'nesterov']):
-    axs[0, j].imshow(img_original, cmap='gray')
-    axs[0, j].set_title('Original')
-    axs[0, j].axis('off')
+    # Mostrar las imágenes en 3 filas: original, ruido, restaurada (simple, momentum, nesterov)
+    fig, axs = plt.subplots(3, 3, figsize=(12, 12))
 
-# Fila 2: Imagen con ruido
-for j, metodo in enumerate(['simple', 'momentum', 'nesterov']):
-    axs[1, j].imshow(img_ruido, cmap='gray')
-    axs[1, j].set_title('Ruido')
-    axs[1, j].axis('off')
+    # Leer imágenes restauradas
+    img_ruido = imagen_ruido.imagen
+    img_simple = foto_simple
+    img_momentum = foto_momentum
+    img_nesterov = foto_nesterov
 
-# Fila 3: Restauradas con iteración alcanzada
-axs[2, 0].imshow(img_simple, cmap='gray')
-axs[2, 0].set_title(f'Simple\n Min: {min_simple} \n Iter: {iter_simple}')
-axs[2, 0].axis('off')
-axs[2, 1].imshow(img_momentum, cmap='gray')
-axs[2, 1].set_title(f'Momentum\n Min: {min_momentum} \n Iter: {iter_momentum}')
-axs[2, 1].axis('off')
-axs[2, 2].imshow(img_nesterov, cmap='gray')
-axs[2, 2].set_title(f'Nesterov\n Min: {min_nesterov} \n Iter: {iter_nesterov}')
-axs[2, 2].axis('off')
+    # ---- Métricas de calidad ----
+    psnr_simple   = psnr(img_original, img_simple)
+    ssim_simple   = ssim(img_original.astype(np.uint8),
+                         img_simple.astype(np.uint8),
+                         data_range=255)
 
-plt.tight_layout()
-plt.show()
+    psnr_momentum = psnr(img_original, img_momentum)
+    ssim_momentum = ssim(img_original.astype(np.uint8),
+                         img_momentum.astype(np.uint8),
+                         data_range=255)
+
+    psnr_nesterov = psnr(img_original, img_nesterov)
+    ssim_nesterov = ssim(img_original.astype(np.uint8),
+                         img_nesterov.astype(np.uint8),
+                         data_range=255)
+
+    # Iteraciones alcanzadas para cada método
+
+
+
+    # Fila 1: Imagen original
+    for j, metodo in enumerate(['simple', 'momentum', 'nesterov']):
+        axs[0, j].imshow(img_original, cmap='gray')
+        axs[0, j].set_title('Original')
+        axs[0, j].axis('off')
+
+    # Fila 2: Imagen con ruido
+    for j, metodo in enumerate(['simple', 'momentum', 'nesterov']):
+        axs[1, j].imshow(img_ruido, cmap='gray')
+        axs[1, j].set_title(f'Ruido {ruido}')
+        axs[1, j].axis('off')
+
+    # Fila 3: Restauradas con iteración alcanzada
+    axs[2, 0].imshow(img_simple, cmap='gray')
+    axs[2, 0].set_title(
+        f"Simple\nPSNR: {psnr_simple:.1f} dB | SSIM: {ssim_simple:.3f}"
+        f"\nMin: {min_simple:.2e} | Iter: {iter_simple}"
+    )
+    axs[2, 0].axis('off')
+    axs[2, 1].imshow(img_momentum, cmap='gray')
+    axs[2, 1].set_title(
+        f"Momentum\nPSNR: {psnr_momentum:.1f} dB | SSIM: {ssim_momentum:.3f}"
+        f"\nMin: {min_momentum:.2e} | Iter: {iter_momentum}"
+    )
+    axs[2, 1].axis('off')
+    axs[2, 2].imshow(img_nesterov, cmap='gray')
+    axs[2, 2].set_title(
+        f"Nesterov\nPSNR: {psnr_nesterov:.1f} dB | SSIM: {ssim_nesterov:.3f}"
+        f"\nMin: {min_nesterov:.2e} | Iter: {iter_nesterov}"
+    )
+    axs[2, 2].axis('off')
+
+    plt.tight_layout()
+    plt.savefig(ruta_base + f'comparacion_{ruido}.png')
+    plt.close()
