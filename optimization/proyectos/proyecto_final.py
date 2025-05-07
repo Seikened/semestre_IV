@@ -232,11 +232,11 @@ for ruido in [0, 10, 20, 30, 40, 50]:
 
         plt.tight_layout()
         try:
-            plt.savefig(ruta_base + f'{ruido}/' + f'comparacion_{ruido}_{gradiente.alpha}_{gradiente.eta}.png')
+            plt.savefig(ruta_base + f'ruido_{ruido}/' + f'comparacion_{ruido}_{gradiente.alpha}_{gradiente.eta}.png')
         except FileNotFoundError:
             import os
-            os.makedirs(ruta_base + f'{ruido}/', exist_ok=True)
-            plt.savefig(ruta_base + f'{ruido}/' + f'comparacion_{ruido}_{gradiente.alpha}_{gradiente.eta}.png')
+            os.makedirs(ruta_base + f'ruido_{ruido}/', exist_ok=True)
+            plt.savefig(ruta_base + f'ruido_{ruido}/' + f'comparacion_{ruido}_{gradiente.alpha}_{gradiente.eta}.png')
         except Exception as e:
             print(f"Error al guardar la imagen: {e}")
         
