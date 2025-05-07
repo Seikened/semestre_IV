@@ -1,181 +1,20 @@
-#from mathkat import Gradiente 
+from mathkat import Gradiente 
 from colorstreak import log
 import numpy as np
 import cv2
-from rich.console import Console
 from dataclasses import dataclass, field
 import matplotlib.pyplot as plt
 from skimage.metrics import structural_similarity as ssim
 from numba import jit
 
 
-def psnr(img1, img2, max_pixel: float = 255.0) -> float:
+@jit(nopython=True)
+def psnr(img1, img2, max_pixel: float = 255.0):
     """Calcula PSNR (dB) entre dos imágenes."""
     mse = np.mean((img1 - img2) ** 2)
     if mse == 0:
         return float("inf")
     return 20 * np.log10(max_pixel / np.sqrt(mse))
-
-
-# ================================================ Gradiente temporar (borrar despues de las pruebas) ===========================================================
-
-
-
-console = Console()
-
-@dataclass
-class Gradiente:
-    """
-    Clase que representa una función objetivo y sus métodos de optimización mediante descenso de gradiente.
-    Permite aplicar diferentes variantes del descenso de gradiente y visualizar los resultados en tablas.
-    """
-
-    f : callable
-    grad_f : callable
-    x_0 : np.ndarray
-    v_0 : np.ndarray
-    alpha : float
-    iteraciones : int
-    epsilon : float
-    eta : float
-    x_historico : list = field(default_factory=list, init=False)
-    data : list = field(default_factory=list, init=False)
-
-    @staticmethod
-    def _desempaquetar(func, x_0):
-        try:
-            return func(*x_0)
-        except TypeError:
-            return func(x_0)
-
-        
-
-    def reset(self):
-        """
-        Reinicia el historial de posiciones y datos.
-        """
-        self.x_historico = []
-        self.data = []
-    
-
-    @jit(nopython=True, cache=True)
-    def simple(self):
-        """
-        Realiza el descenso de gradiente estándar para minimizar la función objetivo.
-        En cada iteración, actualiza la posición usando el gradiente y almacena el historial de posiciones y normas.
-        Imprime una tabla con los resultados de cada iteración.
-        
-        Retorna:
-        - x_historico: Lista con el historial de posiciones x en cada iteración.
-        """
-        self.reset()
-        f = self.f
-        grad_f = self.grad_f
-        x0 = self.x_0
-        lr = self.alpha
-        max_iters = self.iteraciones
-        epsilon = self.epsilon
-        self.x_historico = [x0]
-        chico = []
-        
-        for i in range(max_iters):
-            f_i = self._desempaquetar(f, x0)
-            grad_f_i = self._desempaquetar(grad_f, x0)
-            norm_grad = np.linalg.norm(grad_f_i)
-            if norm_grad < epsilon: 
-                break
-            xi = x0 - lr * grad_f_i
-            x0 = xi.copy()
-            print(f"Iteración {i+1}: x0 = {x0}, grad_f = {grad_f_i}, norma_grad = {norm_grad}")
-            self.x_historico.append(x0)
-            self.data.append((i+1, x0.tolist(), norm_grad))
-            chico.append(norm_grad)
-        self.mas_chico = min(chico)
-        self.iteracion_mas_chico = chico.index(self.mas_chico) + 1
-        return self.x_historico
-
-
-    @jit(nopython=True, cache=True)
-    def momentum(self):
-        """
-        Aplica el método de descenso de gradiente con momentum para minimizar la función objetivo.
-        Utiliza un término de velocidad para acelerar la convergencia y almacena el historial de posiciones, normas y velocidades.
-        Imprime una tabla con los resultados de cada iteración.
-        
-        Retorna:
-        - x_historico: Lista con el historial de posiciones x en cada iteración.
-        """
-        self.reset()
-        f = self.f
-        grad_f = self.grad_f
-        x0 = self.x_0
-        v0 = self.v_0
-        lr = self.alpha
-        eta = self.eta
-        max_iters = self.iteraciones
-        epsilon = self.epsilon
-        self.x_historico = [x0]
-        chico = []
-        for i in range(max_iters):
-            f_i = self._desempaquetar(f, x0)
-            grad_f_i = self._desempaquetar(grad_f, x0)
-            norma_grad = np.linalg.norm(grad_f_i)
-            if norma_grad < epsilon:
-                break
-            vi = eta * v0 + lr * grad_f_i
-            xi = x0 - vi
-            x0 = xi.copy()
-            v0 = vi.copy()
-            self.x_historico.append(x0)
-            chico.append(norma_grad)
-            self.data.append((i+1, x0.tolist(), norma_grad, vi.tolist()))
-            print(f"Iteración {i+1}: x0 = {x0}, grad_f = {grad_f_i}, norma_grad = {norma_grad}, velocidad = {vi}")
-        self.mas_chico = min(chico)
-        self.iteracion_mas_chico = chico.index(self.mas_chico) + 1
-        return self.x_historico
-    
-    
-    @jit(nopython=True, cache=True)
-    def nesterov(self):
-        """
-        Aplica el método de descenso de gradiente con Nesterov para minimizar la función objetivo.
-        Utiliza un término de velocidad y calcula el gradiente en la posición adelantada (lookahead).
-        Imprime una tabla con los resultados de cada iteración.
-        
-        Retorna:
-        - x_historico: Lista con el historial de posiciones x en cada iteración.
-        """
-        self.reset()
-        f = self.f
-        grad_f = self.grad_f
-        x0 = self.x_0
-        v0 = self.v_0
-        lr = self.alpha
-        eta = self.eta
-        max_iters = self.iteraciones
-        epsilon = self.epsilon
-        self.x_historico = [x0]
-        chico = []
-        
-        for i in range(max_iters):
-            lookahead = x0 - eta * v0
-            grad_f_i = self._desempaquetar(grad_f, lookahead)
-            norm_grad = np.linalg.norm(grad_f_i)
-            if norm_grad < epsilon:
-                break
-            vi = eta * v0 + lr * grad_f_i
-            xi = x0 - vi
-            x0 = xi.copy()
-            v0 = vi.copy()
-            self.x_historico.append(x0)
-            self.data.append((i+1, x0.tolist(), norm_grad, vi.tolist()))
-            chico.append(norm_grad)
-            print(f"Iteración {i+1}: x0 = {x0}, grad_f = {grad_f_i}, norma_grad = {norm_grad}")
-        self.mas_chico = min(chico)
-        self.iteracion_mas_chico = chico.index(self.mas_chico) + 1
-        print(f"Iteración con menor norma del gradiente: en la iteración: {self.iteracion_mas_chico} con valor {self.mas_chico}")
-        
-        return self.x_historico
 
 
 
@@ -263,18 +102,20 @@ class EnergiaL2:
 # ================================================ PROYECTO FINAL ===========================================================
 
 
+def mensaje(psnr, ssim, min, iter,):
+    return (f"Nesterov\nPSNR: {psnr:.1f} dB | SSIM: {ssim:.3f}"
+            f"\nMin: {min:.2e} | Iter: {iter}")
+    
 # ==================== Ejemplo de uso (actualizado) ====================
 
 ruta_base = '/Users/ferleon/Documents/GitHub/semestre_IV/optimization/proyectos/'
 ruta_img  = ruta_base + 'men_moon.jpg'   
 
 imagen_original = Imagen(ruta_img)
-print(f"Imagen original: {imagen_original.ancho}x{imagen_original.alto}")
 
 reductor = 10
 
 imagen_original.cambiar_tam(imagen_original.ancho // reductor, imagen_original.alto // reductor)
-# Array de imagen original redimensionada para métricas/plots
 img_original = imagen_original.imagen.copy()
 f_img = imagen_original.imagen.astype(np.float32)
 
@@ -282,9 +123,9 @@ imagen_ruido = Imagen(ruta_img)
 imagen_ruido.cambiar_tam(imagen_ruido.ancho // reductor, imagen_ruido.alto // reductor)
 
 for ruido in [0, 10, 20, 30, 40, 50]:
+    
     imagen_ruido.aplicar_ruido_al_pixel(ruido)         
     f_noisy = imagen_ruido.imagen.astype(np.float32)
-    cv2.imwrite(ruta_base + f'imagen_ruido_{ruido}.png', f_noisy)
 
     energia = EnergiaL2(f_noisy, lam=0.2)
 
@@ -305,8 +146,6 @@ for ruido in [0, 10, 20, 30, 40, 50]:
     min_nesterov = gradiente.mas_chico
     iter_nesterov = gradiente.iteracion_mas_chico
     foto_nesterov = gradiente.x_historico[-1].reshape(energia.H, energia.W)
-    cv2.imwrite(ruta_base + f'imagen_denoise_{metodo}.png', foto_nesterov)
-    print(f"Imagen con nesterov guardada como imagen_denoise_{metodo}.png")
 
 
     metodo = 'momentum'
@@ -314,8 +153,6 @@ for ruido in [0, 10, 20, 30, 40, 50]:
     min_momentum = gradiente.mas_chico
     iter_momentum = gradiente.iteracion_mas_chico
     foto_momentum = gradiente.x_historico[-1].reshape(energia.H, energia.W)
-    cv2.imwrite(ruta_base + f'imagen_denoise_{metodo}.png', foto_momentum)
-    print(f"Imagen con momentum guardada como imagen_denoise_{metodo}.png")
 
 
     metodo = 'simple'
@@ -323,13 +160,11 @@ for ruido in [0, 10, 20, 30, 40, 50]:
     min_simple = gradiente.mas_chico
     iter_simple = gradiente.iteracion_mas_chico
     foto_simple = gradiente.x_historico[-1].reshape(energia.H, energia.W)
-    cv2.imwrite(ruta_base + f'imagen_denoise_{metodo}.png', foto_simple)
-    print(f"Imagen con simple guardada como imagen_denoise_{metodo}.png")
-
 
 
     # Mostrar las imágenes en 3 filas: original, ruido, restaurada (simple, momentum, nesterov)
     fig, axs = plt.subplots(3, 3, figsize=(12, 12))
+    fig.suptitle(f'Ruido: {ruido} | Alpha: {gradiente.alpha} | Beta: {gradiente.eta}', fontsize=16)
 
     # Leer imágenes restauradas
     img_ruido = imagen_ruido.imagen
@@ -357,6 +192,8 @@ for ruido in [0, 10, 20, 30, 40, 50]:
 
 
 
+
+
     # Fila 1: Imagen original
     for j, metodo in enumerate(['simple', 'momentum', 'nesterov']):
         axs[0, j].imshow(img_original, cmap='gray')
@@ -366,29 +203,31 @@ for ruido in [0, 10, 20, 30, 40, 50]:
     # Fila 2: Imagen con ruido
     for j, metodo in enumerate(['simple', 'momentum', 'nesterov']):
         axs[1, j].imshow(img_ruido, cmap='gray')
-        axs[1, j].set_title(f'Ruido {ruido}')
+        axs[1, j].set_title(f'Ruido')
         axs[1, j].axis('off')
 
-    # Fila 3: Restauradas con iteración alcanzada
+    # Sección de imágenes restauradas
+    # Simple
     axs[2, 0].imshow(img_simple, cmap='gray')
-    axs[2, 0].set_title(
-        f"Simple\nPSNR: {psnr_simple:.1f} dB | SSIM: {ssim_simple:.3f}"
-        f"\nMin: {min_simple:.2e} | Iter: {iter_simple}"
-    )
+    axs[2, 0].set_title(mensaje(
+        psnr_simple, ssim_simple, min_simple, iter_simple
+    ))
+    # Momentum
     axs[2, 0].axis('off')
     axs[2, 1].imshow(img_momentum, cmap='gray')
-    axs[2, 1].set_title(
-        f"Momentum\nPSNR: {psnr_momentum:.1f} dB | SSIM: {ssim_momentum:.3f}"
-        f"\nMin: {min_momentum:.2e} | Iter: {iter_momentum}"
-    )
+    axs[2, 1].set_title(mensaje(
+        psnr_momentum, ssim_momentum, min_momentum, iter_momentum
+    ))
+    
+    # Nesterov
     axs[2, 1].axis('off')
     axs[2, 2].imshow(img_nesterov, cmap='gray')
-    axs[2, 2].set_title(
-        f"Nesterov\nPSNR: {psnr_nesterov:.1f} dB | SSIM: {ssim_nesterov:.3f}"
-        f"\nMin: {min_nesterov:.2e} | Iter: {iter_nesterov}"
-    )
+    axs[2, 2].set_title(mensaje(
+        psnr_nesterov, ssim_nesterov, min_nesterov, iter_nesterov
+    ))
     axs[2, 2].axis('off')
 
     plt.tight_layout()
+    
     plt.savefig(ruta_base + f'comparacion_{ruido}.png')
     plt.close()
