@@ -108,7 +108,10 @@ def mensaje(psnr, ssim, min, iter,):
     
 # ==================== Ejemplo de uso (actualizado) ====================
 
-ruta_base = '/Users/ferleon/Documents/GitHub/semestre_IV/optimization/proyectos/'
+try:
+    ruta_base = '/Users/ferleon/Documents/GitHub/semestre_IV/optimization/proyectos/'
+except:
+    raise FileNotFoundError("No se pudo encontrar la ruta base. Asegúrate de que la ruta sea correcta. o configura la tuya")
 ruta_img  = ruta_base + 'men_moon.jpg'   
 
 imagen_original = Imagen(ruta_img)
