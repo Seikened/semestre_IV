@@ -122,112 +122,122 @@ f_img = imagen_original.imagen.astype(np.float32)
 imagen_ruido = Imagen(ruta_img)
 imagen_ruido.cambiar_tam(imagen_ruido.ancho // reductor, imagen_ruido.alto // reductor)
 
+
+# ================================== Ruido y restauración ==========================================================
 for ruido in [0, 10, 20, 30, 40, 50]:
     
     imagen_ruido.aplicar_ruido_al_pixel(ruido)         
     f_noisy = imagen_ruido.imagen.astype(np.float32)
 
     energia = EnergiaL2(f_noisy, lam=0.2)
+    alphas = [0.001, 0.02, 0.5, 1.0, 2.0]
 
-    gradiente = Gradiente(
-        f       = energia.func,
-        grad_f  = energia.grad,
-        x_0     = energia.f_vec.copy(),
-        v_0     = np.zeros_like(energia.f_vec),
-        alpha   = 2e-2,                                   
-        iteraciones = 1500,
-        epsilon = 1e-6,
-        eta     = 0.8
-    )
+    gradientes = []
+    for alpha in alphas:
+        grad_u = Gradiente(
+            f       = energia.func,
+            grad_f  = energia.grad,
+            x_0     = energia.f_vec.copy(),
+            v_0     = np.zeros_like(energia.f_vec),
+            alpha   = alpha,                                   
+            iteraciones = 1500,
+            epsilon = 1e-6,
+            eta     = 0.8
+        )
+        gradientes.append(grad_u)
 
+    for gradiente in gradientes:
 
-    metodo = 'nesterov' 
-    grad_nesterov = gradiente.nesterov()
-    min_nesterov = gradiente.mas_chico
-    iter_nesterov = gradiente.iteracion_mas_chico
-    foto_nesterov = gradiente.x_historico[-1].reshape(energia.H, energia.W)
-
-
-    metodo = 'momentum'
-    grad_momentum = gradiente.momentum()
-    min_momentum = gradiente.mas_chico
-    iter_momentum = gradiente.iteracion_mas_chico
-    foto_momentum = gradiente.x_historico[-1].reshape(energia.H, energia.W)
+        metodo = 'nesterov' 
+        grad_nesterov = gradiente.nesterov()
+        min_nesterov = gradiente.mas_chico
+        iter_nesterov = gradiente.iteracion_mas_chico
+        foto_nesterov = gradiente.x_historico[-1].reshape(energia.H, energia.W)
 
 
-    metodo = 'simple'
-    grad_simple = gradiente.simple()
-    min_simple = gradiente.mas_chico
-    iter_simple = gradiente.iteracion_mas_chico
-    foto_simple = gradiente.x_historico[-1].reshape(energia.H, energia.W)
+        metodo = 'momentum'
+        grad_momentum = gradiente.momentum()
+        min_momentum = gradiente.mas_chico
+        iter_momentum = gradiente.iteracion_mas_chico
+        foto_momentum = gradiente.x_historico[-1].reshape(energia.H, energia.W)
 
 
-    # Mostrar las imágenes en 3 filas: original, ruido, restaurada (simple, momentum, nesterov)
-    fig, axs = plt.subplots(3, 3, figsize=(12, 12))
-    fig.suptitle(f'Ruido: {ruido} | Alpha: {gradiente.alpha} | Beta: {gradiente.eta}', fontsize=16)
-
-    # Leer imágenes restauradas
-    img_ruido = imagen_ruido.imagen
-    img_simple = foto_simple
-    img_momentum = foto_momentum
-    img_nesterov = foto_nesterov
-
-    # ---- Métricas de calidad ----
-    psnr_simple   = psnr(img_original, img_simple)
-    ssim_simple   = ssim(img_original.astype(np.uint8),
-                         img_simple.astype(np.uint8),
-                         data_range=255)
-
-    psnr_momentum = psnr(img_original, img_momentum)
-    ssim_momentum = ssim(img_original.astype(np.uint8),
-                         img_momentum.astype(np.uint8),
-                         data_range=255)
-
-    psnr_nesterov = psnr(img_original, img_nesterov)
-    ssim_nesterov = ssim(img_original.astype(np.uint8),
-                         img_nesterov.astype(np.uint8),
-                         data_range=255)
-
-    # Iteraciones alcanzadas para cada método
+        metodo = 'simple'
+        grad_simple = gradiente.simple()
+        min_simple = gradiente.mas_chico
+        iter_simple = gradiente.iteracion_mas_chico
+        foto_simple = gradiente.x_historico[-1].reshape(energia.H, energia.W)
 
 
 
+# ========================================== Visualización de imágenes ==========================================
+        fig, axs = plt.subplots(3, 3, figsize=(12, 12))
+        fig.suptitle(f'Ruido: {ruido} | Alpha: {gradiente.alpha} | Beta: {gradiente.eta}', fontsize=16)
+
+        # Leer imágenes restauradas
+        img_ruido = imagen_ruido.imagen
+        img_simple = foto_simple
+        img_momentum = foto_momentum
+        img_nesterov = foto_nesterov
+
+        # ---- Métricas de calidad ----
+        psnr_simple   = psnr(img_original, img_simple)
+        ssim_simple   = ssim(img_original.astype(np.uint8),
+                            img_simple.astype(np.uint8),
+                            data_range=255)
+
+        psnr_momentum = psnr(img_original, img_momentum)
+        ssim_momentum = ssim(img_original.astype(np.uint8),
+                            img_momentum.astype(np.uint8),
+                            data_range=255)
+
+        psnr_nesterov = psnr(img_original, img_nesterov)
+        ssim_nesterov = ssim(img_original.astype(np.uint8),
+                            img_nesterov.astype(np.uint8),
+                            data_range=255)
+
+        # Fila 1: Imagen original
+        for j, metodo in enumerate(['simple', 'momentum', 'nesterov']):
+            axs[0, j].imshow(img_original, cmap='gray')
+            axs[0, j].set_title('Original')
+            axs[0, j].axis('off')
+
+        # Fila 2: Imagen con ruido
+        for j, metodo in enumerate(['simple', 'momentum', 'nesterov']):
+            axs[1, j].imshow(img_ruido, cmap='gray')
+            axs[1, j].set_title(f'Ruido')
+            axs[1, j].axis('off')
+
+        # Sección de imágenes restauradas
+        # Simple
+        axs[2, 0].imshow(img_simple, cmap='gray')
+        axs[2, 0].set_title(mensaje(
+            psnr_simple, ssim_simple, min_simple, iter_simple
+        ))
+        # Momentum
+        axs[2, 0].axis('off')
+        axs[2, 1].imshow(img_momentum, cmap='gray')
+        axs[2, 1].set_title(mensaje(
+            psnr_momentum, ssim_momentum, min_momentum, iter_momentum
+        ))
+        
+        # Nesterov
+        axs[2, 1].axis('off')
+        axs[2, 2].imshow(img_nesterov, cmap='gray')
+        axs[2, 2].set_title(mensaje(
+            psnr_nesterov, ssim_nesterov, min_nesterov, iter_nesterov
+        ))
+        axs[2, 2].axis('off')
 
 
-    # Fila 1: Imagen original
-    for j, metodo in enumerate(['simple', 'momentum', 'nesterov']):
-        axs[0, j].imshow(img_original, cmap='gray')
-        axs[0, j].set_title('Original')
-        axs[0, j].axis('off')
-
-    # Fila 2: Imagen con ruido
-    for j, metodo in enumerate(['simple', 'momentum', 'nesterov']):
-        axs[1, j].imshow(img_ruido, cmap='gray')
-        axs[1, j].set_title(f'Ruido')
-        axs[1, j].axis('off')
-
-    # Sección de imágenes restauradas
-    # Simple
-    axs[2, 0].imshow(img_simple, cmap='gray')
-    axs[2, 0].set_title(mensaje(
-        psnr_simple, ssim_simple, min_simple, iter_simple
-    ))
-    # Momentum
-    axs[2, 0].axis('off')
-    axs[2, 1].imshow(img_momentum, cmap='gray')
-    axs[2, 1].set_title(mensaje(
-        psnr_momentum, ssim_momentum, min_momentum, iter_momentum
-    ))
-    
-    # Nesterov
-    axs[2, 1].axis('off')
-    axs[2, 2].imshow(img_nesterov, cmap='gray')
-    axs[2, 2].set_title(mensaje(
-        psnr_nesterov, ssim_nesterov, min_nesterov, iter_nesterov
-    ))
-    axs[2, 2].axis('off')
-
-    plt.tight_layout()
-    
-    plt.savefig(ruta_base + f'comparacion_{ruido}.png')
-    plt.close()
+        plt.tight_layout()
+        try:
+            plt.savefig(ruta_base + f'{ruido}/' + f'comparacion_{ruido}_{gradiente.alpha}_{gradiente.eta}.png')
+        except FileNotFoundError:
+            import os
+            os.makedirs(ruta_base + f'{ruido}/', exist_ok=True)
+            plt.savefig(ruta_base + f'{ruido}/' + f'comparacion_{ruido}_{gradiente.alpha}_{gradiente.eta}.png')
+        except Exception as e:
+            print(f"Error al guardar la imagen: {e}")
+        
+        plt.close()
