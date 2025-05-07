@@ -102,8 +102,8 @@ class EnergiaL2:
 # ================================================ PROYECTO FINAL ===========================================================
 
 
-def mensaje(psnr, ssim, min, iter,):
-    return (f"Nesterov\nPSNR: {psnr:.1f} dB | SSIM: {ssim:.3f}"
+def mensaje(metodo,psnr, ssim, min, iter,):
+    return (f"{metodo}\nPSNR: {psnr:.1f} dB | SSIM: {ssim:.3f}"
             f"\nMin: {min:.2e} | Iter: {iter}")
     
 # ==================== Ejemplo de uso (actualizado) ====================
@@ -143,7 +143,7 @@ for ruido in [0, 10, 20, 30, 40, 50]:
             x_0     = energia.f_vec.copy(),
             v_0     = np.zeros_like(energia.f_vec),
             alpha   = alpha,                                   
-            iteraciones = 1500,
+            iteraciones = 2000,
             epsilon = 1e-6,
             eta     = 0.8
         )
@@ -214,20 +214,20 @@ for ruido in [0, 10, 20, 30, 40, 50]:
         # Sección de imágenes restauradas
         # Simple
         axs[2, 0].imshow(img_simple, cmap='gray')
-        axs[2, 0].set_title(mensaje(
+        axs[2, 0].set_title(mensaje('simple',
             psnr_simple, ssim_simple, min_simple, iter_simple
         ))
         # Momentum
         axs[2, 0].axis('off')
         axs[2, 1].imshow(img_momentum, cmap='gray')
-        axs[2, 1].set_title(mensaje(
+        axs[2, 1].set_title(mensaje('momentum',
             psnr_momentum, ssim_momentum, min_momentum, iter_momentum
         ))
         
         # Nesterov
         axs[2, 1].axis('off')
         axs[2, 2].imshow(img_nesterov, cmap='gray')
-        axs[2, 2].set_title(mensaje(
+        axs[2, 2].set_title(mensaje('nesterov',
             psnr_nesterov, ssim_nesterov, min_nesterov, iter_nesterov
         ))
         axs[2, 2].axis('off')
