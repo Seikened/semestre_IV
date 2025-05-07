@@ -2,10 +2,9 @@
 from colorstreak import log
 import numpy as np
 import cv2
-from rich.table import Table
 from rich.console import Console
-import functools
 from dataclasses import dataclass, field
+import matplotlib.pyplot as plt
 
 
 # ================================================ Gradiente temporar (borrar despues de las pruebas) ===========================================================
@@ -13,29 +12,6 @@ from dataclasses import dataclass, field
 
 
 console = Console()
-
-def imprimir_tabla(func):
-    @functools.wraps(func)
-    def wrapper(self, *args, **kwargs):
-        resultado = func(self, *args, **kwargs)
-        if hasattr(self, 'data'):
-            nombre_func = func.__name__
-
-            match nombre_func:
-                case "simple":
-                    headers = ["Iteración", "x", "Norma"]
-                case "momentum":
-                    headers = ["Iteración", "x", "Norma", "velocidad"]
-                case "nesterov":
-                    headers = ["Iteración", "x", "Norma", "velocidad"]
-            table = Table(title=f"[bold magenta]Resultados de {nombre_func.capitalize()}[/bold magenta]", show_lines=True)
-            for header in headers:
-                table.add_column(header.upper(), justify="center", style="yellow", no_wrap=True)
-            for row in self.data:
-                table.add_row(*[str(x) for x in row])
-            console.print(table)
-        return resultado
-    return wrapper
 
 @dataclass
 class Gradiente:
@@ -90,6 +66,7 @@ class Gradiente:
         max_iters = self.iteraciones
         epsilon = self.epsilon
         self.x_historico = [x0]
+        chico = []
         
         for i in range(max_iters):
             f_i = self._desempaquetar(f, x0)
@@ -102,6 +79,9 @@ class Gradiente:
             log.info(f"Iteración {i+1}: x0 = {x0}, grad_f = {grad_f_i}, norma_grad = {norm_grad}")
             self.x_historico.append(x0)
             self.data.append((i+1, x0.tolist(), norm_grad))
+            chico.append(norm_grad)
+        self.mas_chico = min(chico)
+        self.iteracion_mas_chico = chico.index(self.mas_chico) + 1
         return self.x_historico
 
 
@@ -125,7 +105,7 @@ class Gradiente:
         max_iters = self.iteraciones
         epsilon = self.epsilon
         self.x_historico = [x0]
-        
+        chico = []
         for i in range(max_iters):
             f_i = self._desempaquetar(f, x0)
             grad_f_i = self._desempaquetar(grad_f, x0)
@@ -137,8 +117,11 @@ class Gradiente:
             x0 = xi.copy()
             v0 = vi.copy()
             self.x_historico.append(x0)
+            chico.append(norma_grad)
             self.data.append((i+1, x0.tolist(), norma_grad, vi.tolist()))
             log.info(f"Iteración {i+1}: x0 = {x0}, grad_f = {grad_f_i}, norma_grad = {norma_grad}, velocidad = {vi}")
+        self.mas_chico = min(chico)
+        self.iteracion_mas_chico = chico.index(self.mas_chico) + 1
         return self.x_historico
     
     
@@ -178,9 +161,9 @@ class Gradiente:
             self.data.append((i+1, x0.tolist(), norm_grad, vi.tolist()))
             chico.append(norm_grad)
             log.info(f"Iteración {i+1}: x0 = {x0}, grad_f = {grad_f_i}, norma_grad = {norm_grad}")
-        mas_chico = min(chico)
-        iteracion_mas_chico = chico.index(mas_chico) + 1
-        log.info(f"Iteración con menor norma del gradiente: en la iteración: {iteracion_mas_chico} con valor {mas_chico}")
+        self.mas_chico = min(chico)
+        self.iteracion_mas_chico = chico.index(self.mas_chico) + 1
+        log.info(f"Iteración con menor norma del gradiente: en la iteración: {self.iteracion_mas_chico} con valor {self.mas_chico}")
         
         return self.x_historico
 
@@ -277,18 +260,19 @@ ruta_img  = ruta_base + 'men_moon.jpg'
 imagen_original = Imagen(ruta_img)
 log.info(f"Imagen original: {imagen_original.ancho}x{imagen_original.alto}")
 
-imagen_original.cambiar_tam(imagen_original.ancho // 4, imagen_original.alto // 4)
+reductor = 2
+
+imagen_original.cambiar_tam(imagen_original.ancho // reductor, imagen_original.alto // reductor)
 f_img = imagen_original.imagen.astype(np.float32)
 
 imagen_ruido = Imagen(ruta_img)
-imagen_ruido.cambiar_tam(imagen_ruido.ancho // 4, imagen_ruido.alto // 4)
+imagen_ruido.cambiar_tam(imagen_ruido.ancho // reductor, imagen_ruido.alto // reductor)
 imagen_ruido.aplicar_ruido_al_pixel(25)              
 f_noisy = imagen_ruido.imagen.astype(np.float32)
 cv2.imwrite(ruta_base + 'imagen_ruido.png', f_noisy)
 
 energia = EnergiaL2(f_noisy, lam=0.2)
 
-# --- 3. Ejecutar optimizador ---
 gradiente = Gradiente(
     f       = energia.func,
     grad_f  = energia.grad,
@@ -300,6 +284,69 @@ gradiente = Gradiente(
     eta     = 0.8
 )
 
-gradiente.nesterov()
-u_final = gradiente.x_historico[-1].reshape(energia.H, energia.W)
-cv2.imwrite(ruta_base + 'imagen_denoise.png', u_final)
+
+metodo = 'nesterov' 
+grad_nesterov = gradiente.nesterov()
+min_nesterov = gradiente.mas_chico
+iter_nesterov = gradiente.iteracion_mas_chico
+foto_nesterov = gradiente.x_historico[-1].reshape(energia.H, energia.W)
+cv2.imwrite(ruta_base + f'imagen_denoise_{metodo}.png', foto_nesterov)
+print(f"Imagen con nesterov guardada como imagen_denoise_{metodo}.png")
+
+
+metodo = 'momentum'
+grad_momentum = gradiente.momentum()
+min_momentum = gradiente.mas_chico
+iter_momentum = gradiente.iteracion_mas_chico
+foto_momentum = gradiente.x_historico[-1].reshape(energia.H, energia.W)
+cv2.imwrite(ruta_base + f'imagen_denoise_{metodo}.png', foto_momentum)
+print(f"Imagen con momentum guardada como imagen_denoise_{metodo}.png")
+
+
+metodo = 'simple'
+grad_simple = gradiente.simple()
+min_simple = gradiente.mas_chico
+iter_simple = gradiente.iteracion_mas_chico
+foto_simple = gradiente.x_historico[-1].reshape(energia.H, energia.W)
+cv2.imwrite(ruta_base + f'imagen_denoise_{metodo}.png', foto_simple)
+print(f"Imagen con simple guardada como imagen_denoise_{metodo}.png")
+
+# Mostrar las imágenes en 3 filas: original, ruido, restaurada (simple, momentum, nesterov)
+fig, axs = plt.subplots(3, 3, figsize=(12, 12))
+
+# Leer imágenes restauradas
+img_original = imagen_original.imagen
+img_ruido = imagen_ruido.imagen
+img_simple = foto_simple
+img_momentum = foto_momentum
+img_nesterov = foto_nesterov
+
+# Iteraciones alcanzadas para cada método
+
+
+
+# Fila 1: Imagen original
+for j, metodo in enumerate(['simple', 'momentum', 'nesterov']):
+    axs[0, j].imshow(img_original, cmap='gray')
+    axs[0, j].set_title('Original')
+    axs[0, j].axis('off')
+
+# Fila 2: Imagen con ruido
+for j, metodo in enumerate(['simple', 'momentum', 'nesterov']):
+    axs[1, j].imshow(img_ruido, cmap='gray')
+    axs[1, j].set_title('Ruido')
+    axs[1, j].axis('off')
+
+# Fila 3: Restauradas con iteración alcanzada
+axs[2, 0].imshow(img_simple, cmap='gray')
+axs[2, 0].set_title(f'Simple\n Min: {min_simple} \n Iter: {iter_simple}')
+axs[2, 0].axis('off')
+axs[2, 1].imshow(img_momentum, cmap='gray')
+axs[2, 1].set_title(f'Momentum\n Min: {min_momentum} \n Iter: {iter_momentum}')
+axs[2, 1].axis('off')
+axs[2, 2].imshow(img_nesterov, cmap='gray')
+axs[2, 2].set_title(f'Nesterov\n Min: {min_nesterov} \n Iter: {iter_nesterov}')
+axs[2, 2].axis('off')
+
+plt.tight_layout()
+plt.show()
